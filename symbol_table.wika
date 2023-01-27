@@ -1,0 +1,40 @@
+Token			Lexeme							Definition
+kunin			Keyword 						Input statement
+tignan			Keyword 						Output statement
+bool			Data Type						Boolean data type
+karakter		Data Type						Character data type
+buumbilang		Data Type						Integer data type
+bahagingbilang	Data Type						Floating data type
+string			Data Type						String data type
+tama			Constant						Boolean constant value
+mali			Constant						Boolean constant value
+kung			Keyword							Conditional statement
+kundi_kung		Reserved Word					Part of conditional
+kundi			Reserved Word					Conditional statement
+habang			Keyword							Looping statement
+hanggang		Reserved Word					Part of looping statement
+gawin			Reserved Word					Part of looping statement
+hindi			Operator - Logical				Logical Not operator
+at				Operator - Logical				Logical And operator
+o_kaya			Operator - Logical				Logical Or operator
++				Operator - Arithmetic			Addition symbol
+-				Operator - Arithmetic			Subtraction symbol
+*				Operator - Arithmetic			Multiplication symbol
+/				Operator - Arithmetic			Division symbol
+%				Operator - Arithmetic			Modulus symbol
+>				Operator - Relational			Greater than symbol
+>=				Operator - Relational			Greater than or equal symbol
+<				Operator - Relational			Less than symbol
+<=				Operator - Relational			Greater than or equal symbol
+==	 			Operator - Relational	 		Equal symbol
+!>				Operator - Relational			Not equal symbol
+=				Operator - Assignment			Assignment symbol
+(				Delimeter and Bracket			Open parenthesis - begining of expression
+)				Delimeter and Bracket			Close parenthesis - closing of expression
+{				Delimeter and Bracket			Open brace - beginning of multiple statements
+}				Delimeter and Bracket			Close brace - closing the multiple statements
+'				Delimeter and Bracket			Single quote - enclosing character constants
+"				Delimeter and Bracket			Double quoutes - enclosing string constants
+//...			Comment							Single line comment or start of multiple line comments
+/*...*/			Comment							End of multiple line or document comments
+;				Semicolon						End of statement/Statement separator

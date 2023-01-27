@@ -1,0 +1,19 @@
+letter 			= [a-zA-Z]
+digit 			= [0-9]
+digits 			= digit digit
+identifier 		= letter | (letter | digit | _)
+fraction 			= . digits | ε
+exponent 			= ((E | e) (+ | - | ε)) digits) | ε
+number 			= digits fraction exponent
+operator 			= [+|-|*|/|%|>|>=|<|<=|==|!>]
+parenthesis 		= ( | )
+comments 			=  [// (letter | digit | ?)* \n] | [/*(letter | digit | ?)*(*/)]
+Keyword			= [a-z]	
+Data Type 			= [a-z]	
+Reserved Word 		= [a-z]
+Operator-Logical		= [a-zA-Z]
+Operator-Arithmetic	= +|-|*|/|%
+Operator-Relational	= >|>=|<|<=|==|!=
+Delimeter = (|)|;|{|}|'|"|,|.
+
+

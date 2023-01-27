@@ -1,0 +1,9 @@
+INT a
+STRING NAME = "ELY", -age = "18"
+a := GET(
+if a >= 5 then VIEW("a = ", a)
+LOOP (3 times) DO 
+a = _a + 10
+VIEW("x = ",)
+VIEW("HELLO')
+b := get()

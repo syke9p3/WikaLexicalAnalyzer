@@ -1,0 +1,20 @@
+Line	Syntax						Validity		Message
+
+1	INT a						Invalid		Unknown syntax "INT"
+
+2	STRING NAME = "ELY", -age = "18"	Valid
+
+3	a := GET(						Invalid		Expected/missing ")"
+
+4	if x >= 5 then VIEW("x = ", x)	Valid
+
+5	LOOP (3 times) DO				Invalid		Unknown syntax "times"
+
+6	a = _a + 10					Invalid		Invalid symbol "_"
+
+7	VIEW("x = ",)					Invalid		Expected identifier/variable
+		
+8	VIEW("HELLO')					Invalid		Expected/missing """ 
+
+9	b := get()					Invalid		Invalid syntax
+				

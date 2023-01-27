@@ -1,0 +1,32 @@
+
+INDEX			TOKEN				TYPE			DESCRIPTION		
+0			!				LOG_OP			Logical Operator
+1			!=				REL_OP			Relational Operator
+2			=				ASSIGN_OP			Assignment Operator
+3			string				DATA_TYPE			String Data Type
+4			xyz_123				IDENTIFIER		Identifier xyz_123
+5			=				ASSIGN_OP			Assignment Operator
+6			abc				IDENTIFIER		Identifier abc
+7			+				ARITH_OP				Addition Symbol
+8			2				CONSTANT		Integer Constant Value
+9			-				ARITH_OP				Subraction Symbol
+10			;				SEMICOLON				Semicolon
+11			/				ARITH_OP				Division Symbol
+12			%				ARITH_OP				Modulus Symbol
+13			\				DELIMITER				Backslash
+14			n				IDENTIFIER		Identifier n
+15			if				IDENTIFIER		Identifier if
+16			for				IDENTIFIER		Identifier for
+17			while				IDENTIFIER		Identifier while
+18			-				ARITH_OP				Subraction Symbol
+19			<=				REL_OP			Relational Operator
+20			==				REL_OP			Relational Operator
+21			>=				REL_OP			Relational Operator
+22			float				IDENTIFIER		Identifier float
+23			{				DELIMITER				Left Braces
+24			}				DELIMITER				Right Braces
+25			[				DELIMITER				Left Bracket
+26			]				DELIMITER				Right Bracket
+27			nope				IDENTIFIER		Identifier nope
+28			)				DELIMITER				Right Parenthesis
+29			(				DELIMITER				Left Parenthesis
