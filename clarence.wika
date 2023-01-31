@@ -1,30 +1,10 @@
+bool ayMatandaNa;
+bool ayMatandaNa = mali;
+buumbilang x string;
+buumbilang edad z
+bool x; a
+a b = 1;
 
-3.14
-22.5
-
-// comment
-/* multiline comment */
-
-"sample"
-
-
-buumbilang a = 9, x, y
-string name = "clarence", age = "18"
-karakter A;
-a = kunin()
-kung A >= 5 tignan("A = ", A)
-hanggang (a) Habang
-{x = x + 6}
-bahagimbilang
-bool
-string
-HINDI
-AT
-KUNG
-KUNDI_KUNG
-KUNDI
-Hanggang gawin Habang
-buumbilang num1 = 20, num2 = 80;
-buumbilang sum;
-sum = num1 + num2;
-hanggang
+if (true) {
+	x = 1 + 2
+}
