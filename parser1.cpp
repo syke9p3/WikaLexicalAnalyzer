@@ -471,6 +471,7 @@ struct Statement
 {
 	int line;
 	string syntax;
+	vector<Token> tokens;
 	bool validity;
 	string message;
 };
@@ -710,6 +711,111 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 // 	return expression;
 // }
 
+Statement parseOutput(vector<Token> *tokens, int *i)
+{
+	int j = *i;
+
+	Token currentToken = (*tokens)[j];
+
+	Statement output;
+	output.line = currentToken.line;
+	output.syntax = "";
+	output.validity = true;
+	output.message = "";
+
+	if (currentToken.type == KEYWORD && currentToken.value == "tignan")
+	{
+		output.syntax += " " + currentToken.value;
+		j++;
+		currentToken = (*tokens)[j];
+
+		if (currentToken.value == "(")
+		{
+			output.syntax += " " + currentToken.value;
+			j++;
+			currentToken = (*tokens)[j];
+
+			if (currentToken.type == IDENTIFIER) // check if variable
+			{
+				output.syntax += " " + currentToken.value;
+				j++;
+				currentToken = (*tokens)[j];
+
+				if (currentToken.value == ")")
+				{
+					output.syntax += " " + currentToken.value;
+					j++;
+					currentToken = (*tokens)[j];
+
+					if (currentToken.value == ";")
+					{
+						output.syntax += " " + currentToken.value;
+					}
+					else
+					{
+						output.validity = false;
+						output.message = "Expected ; ";
+					}
+				}
+			}
+			else if (currentToken.value == "\"") // check if string data type
+			{
+				output.syntax += "" + currentToken.value;
+				j++;
+				currentToken = (*tokens)[j];
+
+				if (currentToken.type == CONSTANT)
+				{
+					output.syntax += "" + currentToken.value;
+					j++;
+					currentToken = (*tokens)[j];
+
+					if (currentToken.value == "\"")
+					{
+						output.syntax += "" + currentToken.value;
+						j++;
+						currentToken = (*tokens)[j];
+						if (currentToken.value == ")")
+						{
+							output.syntax += "" + currentToken.value;
+							j++;
+							currentToken = (*tokens)[j];
+
+							if (currentToken.value == ";")
+							{
+								output.syntax += " " + currentToken.value;
+							}
+							else
+							{
+								output.validity = false;
+								output.message = "Expected ; ";
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				output.validity = false;
+				output.message = "Expected string ";
+			}
+		}
+		else
+		{
+			output.validity = false;
+			output.message = "Expected '(' ";
+		}
+	}
+	else
+	{
+		output.validity = false;
+		output.message = "Expected keyword 'tignan' ";
+	}
+
+	*i = j;
+	return output;
+}
+
 Statement parseVariables(vector<Token> *tokens, int *i)
 {
 	int j = *i;
@@ -733,6 +839,12 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 			variables.syntax += " " + currentToken.value;
 			j++;
 			currentToken = (*tokens)[j];
+
+			// if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER) {
+			// 	variables.syntax += " " + currentToken.value;
+			// 	j++;
+			// 	currentToken = (*tokens)[j];
+			// }
 
 			// if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
 			// {
@@ -837,6 +949,7 @@ Statement parseDeclaration(vector<Token> *tokens, int *i)
 		currentToken = (*tokens)[j];
 
 		Statement ident_list = parseVariables(tokens, &j);
+
 		// code
 		if (ident_list.validity)
 		{
@@ -1040,24 +1153,24 @@ Statement parseStatement(vector<Token> *tokens, int *i)
 	// 		statement = parseCompoundStatement(tokens, i);
 	// 	}
 	// 	break;
-	// case KEYWORD:
-	// 	if (currentToken.value == "if")
-	// 	{
-	// 		statement = parseIf(tokens, i);
-	// 	}
-	// 	else if (currentToken.value == "for")
-	// 	{
-	// 		statement = parseFor(tokens, i);
-	// 	}
-	// 	else if (currentToken.value == "while")
-	// 	{
-	// 		statement = parseWhile(tokens, i);
-	// 	}
-	// 	else if (currentToken.value == "do")
-	// 	{
-	// 		statement = parseDoWhile(tokens, i);
-	// 	}
-	// 	break;
+	case KEYWORD:
+		if (currentToken.value == "tignan")
+		{
+			statement = parseOutput(tokens, i);
+		}
+		// 	else if (currentToken.value == "for")
+		// 	{
+		// 		statement = parseFor(tokens, i);
+		// 	}
+		// 	else if (currentToken.value == "while")
+		// 	{
+		// 		statement = parseWhile(tokens, i);
+		// 	}
+		// 	else if (currentToken.value == "do")
+		// 	{
+		// 		statement = parseDoWhile(tokens, i);
+		// 	}
+		break;
 	default:
 		int j = *i;
 		Statement invalidStatement;
