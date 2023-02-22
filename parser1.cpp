@@ -722,34 +722,40 @@ Statement parseOutput(vector<Token> *tokens, int *i)
 	output.syntax = "";
 	output.validity = true;
 	output.message = "";
+	output.tokens;
 
 	if (currentToken.type == KEYWORD && currentToken.value == "tignan")
 	{
 		output.syntax += " " + currentToken.value;
+		output.tokens.push_back(currentToken);
 		j++;
 		currentToken = (*tokens)[j];
 
 		if (currentToken.value == "(")
 		{
 			output.syntax += " " + currentToken.value;
+			output.tokens.push_back(currentToken);
 			j++;
 			currentToken = (*tokens)[j];
 
 			if (currentToken.type == IDENTIFIER) // check if variable
 			{
 				output.syntax += " " + currentToken.value;
+				output.tokens.push_back(currentToken);
 				j++;
 				currentToken = (*tokens)[j];
 
 				if (currentToken.value == ")")
 				{
 					output.syntax += " " + currentToken.value;
+					output.tokens.push_back(currentToken);
 					j++;
 					currentToken = (*tokens)[j];
 
 					if (currentToken.value == ";")
 					{
 						output.syntax += " " + currentToken.value;
+						output.tokens.push_back(currentToken);
 					}
 					else
 					{
@@ -761,29 +767,34 @@ Statement parseOutput(vector<Token> *tokens, int *i)
 			else if (currentToken.value == "\"") // check if string data type
 			{
 				output.syntax += "" + currentToken.value;
+				output.tokens.push_back(currentToken);
 				j++;
 				currentToken = (*tokens)[j];
 
 				if (currentToken.type == CONSTANT)
 				{
 					output.syntax += "" + currentToken.value;
+					output.tokens.push_back(currentToken);
 					j++;
 					currentToken = (*tokens)[j];
 
 					if (currentToken.value == "\"")
 					{
 						output.syntax += "" + currentToken.value;
+						output.tokens.push_back(currentToken);
 						j++;
 						currentToken = (*tokens)[j];
 						if (currentToken.value == ")")
 						{
 							output.syntax += "" + currentToken.value;
+							output.tokens.push_back(currentToken);
 							j++;
 							currentToken = (*tokens)[j];
 
 							if (currentToken.value == ";")
 							{
 								output.syntax += " " + currentToken.value;
+								output.tokens.push_back(currentToken);
 							}
 							else
 							{
@@ -1258,6 +1269,40 @@ void printSyntax(vector<Statement> statements)
 	}
 }
 
+void testStatementTokens(vector<Statement> statements)
+{
+	cout << "\n\n\nTEST STATEMENT TOKEN\n\n\n";
+
+	cout << endl
+		 << "LINE\t"
+		 << "TOKEN\t\t\t\t\t"
+		 << "VALIDITY\t\t\t"
+		 << "MESSAGE\t\t"
+		 << endl;
+	for (int i = 0; i < statements.size(); i++)
+	{
+		Statement statement = statements[i];
+
+		cout << statement.line << "\t";
+
+		for (int i = 0; i < statement.tokens.size(); i++)
+		{
+			cout << statement.tokens[i].value << " ";
+		}
+
+		if (statement.validity)
+		{
+			cout << "Valid";
+		}
+		else
+		{
+			cout << "Invalid";
+		}
+		cout << "\t\t\t";
+		cout << statement.message << endl;
+	}
+}
+
 int main()
 {
 
@@ -1293,6 +1338,7 @@ int main()
 			printTokens(tokens);
 			vector<Statement> statements = parse(&tokens);
 			printSyntax(statements);
+			testStatementTokens(statements);
 		}
 		else
 		{
