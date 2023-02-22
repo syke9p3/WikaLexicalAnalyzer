@@ -720,9 +720,9 @@ Statement parseOutput(vector<Token> *tokens, int *i)
 	Statement output;
 	output.line = currentToken.line;
 	output.syntax = "";
+	output.tokens;
 	output.validity = true;
 	output.message = "";
-	output.tokens;
 
 	if (currentToken.type == KEYWORD && currentToken.value == "tignan")
 	{
