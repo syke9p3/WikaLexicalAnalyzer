@@ -1,6 +1,1 @@
-int x, y = 1 + 2, z = "hello";
-c = 4;
-string greetings = "hello";
-int x = 1;
-int y = 2 + 3 + 5;
-c = a + b;
+
