@@ -27,7 +27,8 @@ Members:
 using namespace std;
 
 string fileName = "clarence.wika";
-string outputFileName = "output_symbol_table.wika";
+string outputFileLexer = "output_Lexer.wika";
+string outputFileParser = "output_Parser.wika";
 
 /*============================= LEXER ========================================================================*/
 
@@ -384,7 +385,7 @@ vector<Token> tokenize(string input)
 
 void printTokens(vector<Token> tokens)
 {
-	ofstream file(outputFileName);
+	ofstream file(outputFileLexer);
 	if (file.is_open())
 	{
 
@@ -460,7 +461,7 @@ void printTokens(vector<Token> tokens)
 	}
 	cout << ">> Generating output symbol table..." << endl
 		 << endl;
-	cout << ">> Output file generated: " << outputFileName << endl
+	cout << ">> Output file generated: " << outputFileLexer << endl
 		 << endl;
 	file.close();
 }
@@ -668,44 +669,6 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 	expression.message = "";
 	expression.tokens;
 
-	// if (currentToken.value == "\"") // it's a string
-	// {
-
-	// 	expression.syntax += "" + currentToken.value;
-	// 	expression.tokens.push_back(currentToken);
-	// 	j++;
-	// 	currentToken = (*tokens)[j];
-
-	// 	if (currentToken.type == CONSTANT)
-	// 	{
-	// 		expression.syntax += " " + currentToken.value;
-	// 		expression.tokens.push_back(currentToken);
-
-	// 		j++;
-	// 		currentToken = (*tokens)[j];
-
-	// 		if (currentToken.value == "\"")
-	// 		{
-
-	// 			expression.syntax += "" + currentToken.value;
-	// 			expression.tokens.push_back(currentToken);
-	// 			j++;
-	// 			currentToken = (*tokens)[j];
-
-	// 		}
-	// 		else
-	// 		{
-	// 			expression.validity = false;
-	// 			expression.message = "Expected string constant";
-	// 		}
-	// 	}
-	// 	else
-	// 	{
-	// 		expression.validity = false;
-	// 		expression.message = "Expected string constant";
-	// 	}
-	// }
-	// else
 	if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER || currentToken.value == "\""))
 	{
 
@@ -756,8 +719,6 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 	}
 	else if (currentToken.value == ";")
 	{
-		// expression.syntax += " " + currentToken.value;
-		// expression.tokens.push_back(currentToken);
 	}
 	else if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER) && (*tokens)[j + 1].value != ";")
 	{
@@ -1322,6 +1283,47 @@ void testStatementTokens(vector<Statement> statements)
 		// cout << statement.message
 		cout << endl;
 	}
+
+	ofstream file(outputFileParser);
+	if (file.is_open())
+	{
+
+		file << endl
+			 << "LINE\t\t\t"
+			 << "INDEX\t\t\t"
+			 << "TOKEN\t\t\t\t"
+			 << "TYPE\t\t\t"
+			 << "DESCRIPTION\t\t"
+			 << endl;
+		for (int i = 0; i < statements.size(); i++)
+	{
+		Statement statement = statements[i];
+
+		file << statement.line << "\t";
+
+		for (int i = 0; i < statement.tokens.size(); i++)
+		{
+			file << statement.tokens[i].value << " ";
+		}
+
+		if (statement.validity)
+		{
+			file << "Valid"; 
+		}
+		else
+		{
+			file << "Invalid";
+		}
+		file << "\t\t\t";
+		file << statement.message;
+		file << endl;
+	}
+	}
+	cout << ">> Generating syntax tree..." << endl
+		 << endl;
+	cout << ">> Output file generated: " << outputFileParser << endl
+		 << endl;
+	file.close();
 }
 
 int main()
@@ -1369,99 +1371,3 @@ int main()
 
 	return 0;
 }
-/*
-// Check for the presence of identifier
-		if (currentToken.type == IDENTIFIER)
-		{
-			declaration.syntax += " " + currentToken.value;
-			j++;
-			currentToken = (*tokens)[j];
-			// Check for the presence of = sign and expression
-			if (currentToken.value == "=")
-			{
-				declaration.syntax += " " + currentToken.value;
-				j++;
-				currentToken = (*tokens)[j];
-
-				if (currentToken.type == CONSTANT)
-				{
-					declaration.syntax += " " + currentToken.value;
-					j++;
-					currentToken = (*tokens)[j];
-				}
-				else
-				{
-					declaration.validity = false;
-					declaration.message = "Expected constant " + but_got(currentToken);
-				}
-				// Statement expression = parseExpression(tokens, j);
-
-				// if (!expression.validity)
-				// {
-				// 	declaration.validity = false;
-				// 	declaration.message = "Expected expression";
-				// 	return declaration;
-				// }
-				// else
-				// {
-				// 	declaration.syntax += " = " + expression.syntax;
-				// }
-			}
-
-			if (currentToken.value == ",")
-			{
-				declaration.syntax += currentToken.value;
-				j++;
-				currentToken = (*tokens)[j];
-				if (currentToken.type == IDENTIFIER)
-				{
-					declaration.syntax += currentToken.value;
-					j++;
-					currentToken = (*tokens)[j];
-					if (currentToken.value == "=")
-					{
-						declaration.syntax += " " + currentToken.value;
-						j++;
-						currentToken = (*tokens)[j];
-
-						if (currentToken.type == CONSTANT)
-						{
-							declaration.syntax += " " + currentToken.value;
-							j++;
-							currentToken = (*tokens)[j];
-						}
-						else
-						{
-							declaration.validity = false;
-							declaration.message = "Expected constant " + but_got(currentToken);
-						}
-						// Statement expression = parseExpression(tokens, j);
-
-						// if (!expression.validity)
-						// {
-						// 	declaration.validity = false;
-						// 	declaration.message = "Expected expression";
-						// 	return declaration;
-						// }
-						// else
-						// {
-						// 	declaration.syntax += " = " + expression.syntax;
-						// }
-					}
-				}
-				else
-				{
-					declaration.validity = false;
-					declaration.message = "Expected identifier " + but_got(currentToken);
-				}
-			}
-
-
-		}
-		else
-		{
-			declaration.validity = false;
-			declaration.message = "Expected identifier " + but_got(currentToken);
-		}
-
-*/

@@ -1,0 +1,8 @@
+
+LINE			INDEX			TOKEN				TYPE			DESCRIPTION		
+1	int x , y = 1 + 2 - 3 / 4 , z = " hello " + 7 ; Valid			
+2	c = 4 ; Valid			
+3	string greetings = " hello " + 1 ; Valid			
+4	int x = 1 ; Valid			
+5	int y = 2 + 3 + 5 ; Valid			
+6	c = a + b ; Valid			

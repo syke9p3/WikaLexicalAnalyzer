@@ -1,4 +1,4 @@
-int x, y = 1 + 2 - 3 / 4, z = "hello";
+int x, y = 1 + 2 - 3 / 4, z = "hello" + 7;
 c = 4;
 string greetings = "hello" + 1;
 int x = 1;

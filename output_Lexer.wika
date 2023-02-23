@@ -1,0 +1,68 @@
+
+LINE			INDEX			TOKEN				TYPE			DESCRIPTION		
+1			0			int				DATA_TYPE			Integer Data Type
+1			1			x				IDENTIFIER		Identifier x
+1			2			,				DELIMITER				Comma
+1			3			y				IDENTIFIER		Identifier y
+1			4			=				ASSIGN_OP			Assignment Operator
+1			5			1				CONSTANT		Integer Constant Value
+1			6			+				ARITH_OP				Addition Symbol
+1			7			2				CONSTANT		Integer Constant Value
+1			8			-				ARITH_OP				Subraction Symbol, line
+1			9			3				CONSTANT		Integer Constant Value
+1			10			/				ARITH_OP				Division Symbol
+1			11			4				CONSTANT		Integer Constant Value
+1			12			,				DELIMITER				Comma
+1			13			z				IDENTIFIER		Identifier z
+1			14			=				ASSIGN_OP			Assignment Operator
+1			15			"				DELIMITER				Delimiter Double Quotation
+1			16			hello				CONSTANT		String Constant Value
+1			17			"				DELIMITER				Delimiter Double Quotation
+1			18			+				ARITH_OP				Addition Symbol
+1			19			7				CONSTANT		Integer Constant Value
+1			20			;				SEMICOLON				Semicolon
+1			21			
+				New Line Character
+2			22			c				IDENTIFIER		Identifier c
+2			23			=				ASSIGN_OP			Assignment Operator
+2			24			4				CONSTANT		Integer Constant Value
+2			25			;				SEMICOLON				Semicolon
+2			26			
+				New Line Character
+3			27			string				DATA_TYPE			String Data Type
+3			28			greetings				IDENTIFIER		Identifier greetings
+3			29			=				ASSIGN_OP			Assignment Operator
+3			30			"				DELIMITER				Delimiter Double Quotation
+3			31			hello				CONSTANT		String Constant Value
+3			32			"				DELIMITER				Delimiter Double Quotation
+3			33			+				ARITH_OP				Addition Symbol
+3			34			1				CONSTANT		Integer Constant Value
+3			35			;				SEMICOLON				Semicolon
+3			36			
+				New Line Character
+4			37			int				DATA_TYPE			Integer Data Type
+4			38			x				IDENTIFIER		Identifier x
+4			39			=				ASSIGN_OP			Assignment Operator
+4			40			1				CONSTANT		Integer Constant Value
+4			41			;				SEMICOLON				Semicolon
+4			42			
+				New Line Character
+5			43			int				DATA_TYPE			Integer Data Type
+5			44			y				IDENTIFIER		Identifier y
+5			45			=				ASSIGN_OP			Assignment Operator
+5			46			2				CONSTANT		Integer Constant Value
+5			47			+				ARITH_OP				Addition Symbol
+5			48			3				CONSTANT		Integer Constant Value
+5			49			+				ARITH_OP				Addition Symbol
+5			50			5				CONSTANT		Integer Constant Value
+5			51			;				SEMICOLON				Semicolon
+5			52			
+				New Line Character
+6			53			c				IDENTIFIER		Identifier c
+6			54			=				ASSIGN_OP			Assignment Operator
+6			55			a				IDENTIFIER		Identifier a
+6			56			+				ARITH_OP				Addition Symbol
+6			57			b				IDENTIFIER		Identifier b
+6			58			;				SEMICOLON				Semicolon
+6			59			
+				New Line Character
