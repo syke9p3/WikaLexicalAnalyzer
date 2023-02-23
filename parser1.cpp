@@ -528,17 +528,53 @@ Statement parseFactor(vector<Token> *tokens, int *i)
 	factor.message = "";
 	factor.tokens;
 
-	if (currentToken.value == " ")
+	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
 	{
+		factor.syntax += " " + currentToken.value;
+		factor.tokens.push_back(currentToken);
+		j++;
+		currentToken = (*tokens)[j];
+	}
+	else if (currentToken.value == "\"") // a string
+	{
+		factor.syntax += " " + currentToken.value;
+		factor.tokens.push_back(currentToken);
+		j++;
+		currentToken = (*tokens)[j];
+		if (currentToken.type == CONSTANT)
+		{
+			factor.syntax += " " + currentToken.value;
+			factor.tokens.push_back(currentToken);
+			j++;
+			currentToken = (*tokens)[j];
+
+			if (currentToken.value == "\"")
+			{
+				factor.syntax += " " + currentToken.value;
+				factor.tokens.push_back(currentToken);
+			}
+			else
+			{
+				factor.validity = false;
+				factor.message = "Expected \"";
+			}
+		}
+		else
+		{
+			factor.validity = false;
+			factor.message = "Expected a string";
+		}
+	}
+	else
+	{
+		factor.validity = false;
+		factor.message = "Expected a factor";
 	}
 
 	parse_rest(tokens, &factor, &j);
 	*i = j;
 	return factor;
 }
-
-
-
 
 Statement parseTerm(vector<Token> *tokens, int *i)
 {
@@ -553,42 +589,58 @@ Statement parseTerm(vector<Token> *tokens, int *i)
 	term.message = "";
 	term.tokens;
 
-	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
+	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER || currentToken.value == "\"")
 	{
-		term.syntax += " " + currentToken.value;
-		term.tokens.push_back(currentToken);
-		j++;
-		currentToken = (*tokens)[j];
 
-		cout << "debug term token == " << currentToken.value << " and next token == " << (*tokens)[j + 1].value << endl;
+		Statement factor = parseFactor(tokens, &j);
 
-		if (currentToken.value == "*" || currentToken.value == "/")
+		if (factor.validity)
 		{
-			term.syntax += " " + currentToken.value;
-			term.tokens.push_back(currentToken);
-			j++;
-			currentToken = (*tokens)[j];
+			term.syntax += " " + factor.syntax;
+			term.tokens.insert(term.tokens.end(), factor.tokens.begin(), factor.tokens.end());
+			if (currentToken.value == "\"")
+			{
 
-			if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
+				cout << "debug YEEHAW token " << currentToken.value << endl;
+				j++;
+				currentToken = (*tokens)[j];
+			}
+			currentToken = (*tokens)[j];
+			cout << "debug string token == " << currentToken.value << " and next token == " << (*tokens)[j + 1].value << endl;
+
+			if (currentToken.value == "*" || currentToken.value == "/")
 			{
 				term.syntax += " " + currentToken.value;
 				term.tokens.push_back(currentToken);
 				j++;
 				currentToken = (*tokens)[j];
+
+				Statement term2 = parseTerm(tokens, &j);
+
+				if (term2.validity)
+				{
+					term.syntax += term2.syntax;
+					term.tokens.insert(term.tokens.end(), term2.tokens.begin(), term2.tokens.end());
+				}
+				else
+				{
+					term.validity = false;
+					term.message = "Expected a term";
+				}
+			}
+			else if (currentToken.value == ";" || currentToken.value == ",")
+			{
 			}
 			else
 			{
-				term.validity = false;
-				term.message = "Expected an operator";
+				*i = j;
+				return term;
 			}
-		}
-		else if (currentToken.value == ";" || currentToken.value == ",")
-		{
 		}
 		else
 		{
-			*i = j;
-			return term;
+			term.validity = false;
+			term.message = "Expected a term";
 		}
 	}
 	else
@@ -616,44 +668,46 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 	expression.message = "";
 	expression.tokens;
 
-	if (currentToken.value == "\"") // it's a string
+	// if (currentToken.value == "\"") // it's a string
+	// {
+
+	// 	expression.syntax += "" + currentToken.value;
+	// 	expression.tokens.push_back(currentToken);
+	// 	j++;
+	// 	currentToken = (*tokens)[j];
+
+	// 	if (currentToken.type == CONSTANT)
+	// 	{
+	// 		expression.syntax += " " + currentToken.value;
+	// 		expression.tokens.push_back(currentToken);
+
+	// 		j++;
+	// 		currentToken = (*tokens)[j];
+
+	// 		if (currentToken.value == "\"")
+	// 		{
+
+	// 			expression.syntax += "" + currentToken.value;
+	// 			expression.tokens.push_back(currentToken);
+	// 			j++;
+	// 			currentToken = (*tokens)[j];
+
+	// 		}
+	// 		else
+	// 		{
+	// 			expression.validity = false;
+	// 			expression.message = "Expected string constant";
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		expression.validity = false;
+	// 		expression.message = "Expected string constant";
+	// 	}
+	// }
+	// else
+	if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER || currentToken.value == "\""))
 	{
-
-		expression.syntax += "" + currentToken.value;
-		expression.tokens.push_back(currentToken);
-		j++;
-		currentToken = (*tokens)[j];
-
-		if (currentToken.type == CONSTANT)
-		{
-			expression.syntax += " " + currentToken.value;
-			expression.tokens.push_back(currentToken);
-
-			j++;
-			currentToken = (*tokens)[j];
-
-			if (currentToken.value == "\"")
-			{
-
-				expression.syntax += "" + currentToken.value;
-				expression.tokens.push_back(currentToken);
-			}
-			else
-			{
-				expression.validity = false;
-				expression.message = "Expected string constant";
-			}
-		}
-		else
-		{
-			expression.validity = false;
-			expression.message = "Expected string constant";
-		}
-	}
-	else if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER))
-	{
-
-		cout << "debug exp token == " << currentToken.value << " and next token == " << (*tokens)[j + 1].value << endl;
 
 		Statement term = parseTerm(tokens, &j);
 
@@ -661,10 +715,8 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 		{
 			expression.syntax += " " + term.syntax;
 			expression.tokens.insert(expression.tokens.end(), term.tokens.begin(), term.tokens.end());
+
 			currentToken = (*tokens)[j];
-
-		cout << "debug valid term token == " << currentToken.value << " and next token == " << (*tokens)[j + 1].value << endl;
-
 
 			if (currentToken.value == "+" || currentToken.value == "-")
 			{
@@ -975,17 +1027,9 @@ Statement parseDeclaration(vector<Token> *tokens, int *i)
 
 			declaration.syntax += ident_list.syntax;
 			declaration.tokens.insert(declaration.tokens.end(), ident_list.tokens.begin(), ident_list.tokens.end());
-			;
-
 			currentToken = (*tokens)[j];
 
-			if (currentToken.value == "\"")
-			{
-				j++;
-				currentToken = (*tokens)[j];
-			}
-
-			// Check for the presence of ;
+						// Check for the presence of ;
 			if (currentToken.value == ";")
 			{
 				declaration.syntax += currentToken.value;
