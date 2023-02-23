@@ -1,0 +1,13 @@
+Line 1	:	Variable initialization type mismatched
+Line 3	:	Unknown syntax "CHAR"
+Line 3	:	Double Declaration identifier/variable 'A'
+Line 4	:	Identifier/variable 'b' not declared
+Line 5	:	Expected "then"
+Line 6	:	Expected constant/identifier before 'TIMES'
+Line 7	:	Variable 'x' not initialized
+Line 8	:	Expected identifier
+Line 9	:	Variable type mismatched
+Line 10	:	Missing """
+Line 11	:	Expected "if" before condition/s
+Line 12	:	Invalid syntax "get()"
+Line 13	:	Expected "}"

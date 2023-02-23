@@ -517,6 +517,7 @@ void parse_rest(vector<Token> *tokens, Statement *currentStatement, int *j)
 
 Statement parseExpression(vector<Token> *tokens, int *i)
 {
+
 	int j = *i;
 
 	Token currentToken = (*tokens)[j];
@@ -531,17 +532,6 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 	// check tokens
 	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
 	{
-		// check for unary operator
-		if (j > 0)
-		{
-			Token previousToken = (*tokens)[j - 1];
-			if (previousToken.value == "-")
-			{
-				expression.syntax += previousToken.value + currentToken.value;
-				j++;
-				currentToken = (*tokens)[j];
-			}
-		}
 
 		while (currentToken.type == CONSTANT ||
 			   currentToken.type == IDENTIFIER ||
@@ -557,164 +547,50 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 			currentToken = (*tokens)[j];
 		}
 	}
-	else if ((currentToken.type == KEYWORD) && (currentToken.value == "kunin") || (currentToken.value == "tignan"))
-	{
+	else if (currentToken.value == "\"") // it's a string
+	{ 
+
 		expression.syntax += " " + currentToken.value;
+		expression.tokens.push_back(currentToken);
 		j++;
-		if (j < tokens->size())
+		currentToken = (*tokens)[j];
+
+		if (currentToken.type == CONSTANT)
 		{
+			expression.syntax += " " + currentToken.value;
+			expression.tokens.push_back(currentToken);
+
+			j++;
 			currentToken = (*tokens)[j];
-			if (currentToken.value == "(")
+
+			if (currentToken.value == "\"")
 			{
-				// it's a function call
-				int parentheses = 1;
-				expression.syntax += currentToken.value;
-				j++;
-				while (parentheses > 0 && j < tokens->size())
-				{
-					currentToken = (*tokens)[j];
-					expression.syntax += currentToken.value;
-					if (currentToken.value == "(")
-						parentheses++;
-					if (currentToken.value == ")")
-						parentheses--;
-					j++;
-				}
+
+				expression.syntax += "" + currentToken.value;
+				expression.tokens.push_back(currentToken);
+			}
+			else
+			{
+				expression.validity = false;
+				expression.message = "Expected string constant";
 			}
 		}
-	}
-	else if (currentToken.value == "(")
-	{
-		expression.syntax += currentToken.value;
-		j++;
-		int parentheses = 1;
-		while (parentheses > 0 && j < tokens->size())
+		else
 		{
-			currentToken = (*tokens)[j];
-			expression.syntax += currentToken.value;
-			expression.tokens.push_back(currentToken);
-			if (currentToken.value == "(")
-				parentheses++;
-			if (currentToken.value == ")")
-				parentheses--;
-			j++;
+			expression.validity = false;
+			expression.message = "Expected string constant";
 		}
 	}
 	else
 	{
 		expression.validity = false;
-		expression.message = "Error: invalid expression";
-		return expression;
+		expression.message = "Expected expression";
 	}
 
+	parse_rest(tokens, &expression, &j);
 	*i = j;
 	return expression;
 }
-
-// Statement parseExpression(vector<Token> *tokens, int *i)
-// {
-// 	int j = *i;
-
-// 	Token currentToken = (*tokens)[j];
-
-// 	Statement expression;
-// 	expression.line = currentToken.line;
-// 	expression.syntax = "";
-// 	expression.validity = true;
-// 	expression.message = "";
-
-// 	// check tokens
-// 	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
-// 	{
-// 		Token nextToken = (*tokens)[j + 1];
-// 		expression.syntax += " " + currentToken.value;
-
-// 		if (nextToken.type == ARITH_OP)
-// 		{
-// 			j++;
-// 			currentToken = nextToken;
-// 			nextToken = (*tokens)[j + 1];
-// 			expression.syntax += " " + currentToken.value;
-// 			cout << "exp1: " << expression.syntax << endl;
-
-// 			Statement expression2 = parseExpression(tokens, &j);
-
-// 			if (expression.validity)
-// 			{
-// 				cout << "exp2: " << expression2.syntax << endl;
-// 				cout << currentToken.line << " " << currentToken.value << " " << nextToken.value << endl;
-// 				expression.syntax += " " + expression2.syntax;
-// 				cout << expression.syntax << endl;
-// 				*i = j;
-// 			}
-// 			else
-// 			{
-// 				expression.validity = false;
-// 				expression.message = expression2.message;
-// 			}
-// 		}
-// 		else
-// 		{
-// 			j++;
-// 			currentToken = (*tokens)[j];
-// 			parse_rest(tokens, &expression, &j);
-// 			*i = j;
-// 			return expression;
-// 		}
-
-// 	}
-// 	else if ((currentToken.type == KEYWORD) && (currentToken.value == "kunin" || currentToken.value == "tignan"))
-// 	{
-// 		expression.syntax += currentToken.value;
-// 		j++;
-// 		if (j < tokens->size())
-// 		{
-// 			currentToken = (*tokens)[j];
-// 			if (currentToken.value == "(")
-// 			{
-// 				// it's a function call
-// 				int parentheses = 1;
-// 				expression.syntax += currentToken.value;
-// 				j++;
-// 				while (parentheses > 0 && j < tokens->size())
-// 				{
-// 					currentToken = (*tokens)[j];
-// 					expression.syntax += currentToken.value;
-// 					if (currentToken.value == "(")
-// 						parentheses++;
-// 					if (currentToken.value == ")")
-// 						parentheses--;
-// 					j++;
-// 				}
-// 			}
-// 		}
-// 	}
-// 	else if (currentToken.value == "(")
-// 	{
-// 		expression.syntax += currentToken.value;
-// 		j++;
-// 		int parentheses = 1;
-// 		while (parentheses > 0 && j < tokens->size())
-// 		{
-// 			currentToken = (*tokens)[j];
-// 			expression.syntax += currentToken.value;
-// 			if (currentToken.value == "(")
-// 				parentheses++;
-// 			if (currentToken.value == ")")
-// 				parentheses--;
-// 			j++;
-// 		}
-// 	}
-// 	else
-// 	{
-// 		expression.validity = false;
-// 		expression.message = "Error: invalid expression";
-// 		return expression;
-// 	}
-
-// 	*i = j;
-// 	return expression;
-// }
 
 Statement parseOutput(vector<Token> *tokens, int *i)
 {
@@ -922,6 +798,7 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 	}
 
 	*i = j;
+	parse_rest(tokens, &variables, &j);
 	return variables;
 }
 
@@ -953,13 +830,15 @@ Statement parseDeclaration(vector<Token> *tokens, int *i)
 
 			declaration.syntax += ident_list.syntax;
 			declaration.tokens.insert(declaration.tokens.end(), ident_list.tokens.begin(), ident_list.tokens.end());
-			cout << "token value: ";
-			for (const auto &token : declaration.tokens)
-			{
+			;
 
-				cout << token.value << " ";
-			}
 			currentToken = (*tokens)[j];
+
+			if (currentToken.value == "\"")
+			{
+				j++;
+				currentToken = (*tokens)[j];
+			}
 
 			// Check for the presence of ;
 			if (currentToken.value == ";")
@@ -988,49 +867,49 @@ Statement parseDeclaration(vector<Token> *tokens, int *i)
 
 	parse_rest(tokens, &declaration, &j);
 	*i = j;
+
+	declaration.type = "DECLARATION";
 	return declaration;
 }
-
-// Statement parseExpression(vector<Token> *tokens, int i)
-// {
-// 	// ...
-// }
 
 Statement parseAssignment(vector<Token> *tokens, int *i)
 {
 
 	int j = *i;
 
-	Token current_token = (*tokens)[j];
+	Token currentToken = (*tokens)[j];
 
 	Statement assignment;
-	assignment.line = j;
+	assignment.line = currentToken.line;
 	assignment.validity = true;
 	assignment.message = "";
 
-	// <assignment> ::= <IDENTIFIER><ASSIGN_OP><CONSTANT>
+	// <assignment> ::= <IDENTIFIER><ASSIGN_OP><EXPRESSION>
 	// c = 1;
-	if (current_token.type == IDENTIFIER)
+	if (currentToken.type == IDENTIFIER)
 	{
-		assignment.syntax += " " + current_token.value;
+		assignment.syntax += currentToken.value;
+		assignment.tokens.push_back(currentToken);
 		j++;
-		current_token = (*tokens)[j];
+		currentToken = (*tokens)[j];
 
-		if (current_token.type == ASSIGN_OP)
+		if (currentToken.type == ASSIGN_OP)
 		{
-			assignment.syntax += " " + current_token.value;
+			assignment.syntax += " " + currentToken.value;
+			assignment.tokens.push_back(currentToken);
 			j++;
-			current_token = (*tokens)[j];
+			currentToken = (*tokens)[j];
 			Statement expression = parseExpression(tokens, &j);
 			if (expression.validity)
 			{
 				assignment.syntax += " " + expression.syntax;
+				assignment.tokens.insert(assignment.tokens.end(), expression.tokens.begin(), expression.tokens.end());
+				currentToken = (*tokens)[j];
 
-				current_token = (*tokens)[j];
-
-				if (current_token.value == ";")
+				if (currentToken.value == ";")
 				{
-					assignment.syntax += "" + current_token.value;
+					assignment.syntax += "" + currentToken.value;
+					assignment.tokens.push_back(currentToken);
 				}
 				else
 				{
@@ -1038,14 +917,14 @@ Statement parseAssignment(vector<Token> *tokens, int *i)
 					assignment.message = "Expected ;";
 				}
 			}
-			// if (current_token.type == CONSTANT)
+			// if (currentToken.type == CONSTANT)
 			// {
-			// 	assignment.syntax += " " + current_token.value;
+			// 	assignment.syntax += " " + currentToken.value;
 			// 	j++;
-			// 	current_token = (*tokens)[j];
-			// 	if (current_token.value == ";") // current_token.type == DELIMITER &&
+			// 	currentToken = (*tokens)[j];
+			// 	if (currentToken.value == ";") // currentToken.type == DELIMITER &&
 			// 	{
-			// 		assignment.syntax += "" + current_token.value;
+			// 		assignment.syntax += "" + currentToken.value;
 			// 	}
 			// 	else
 			// 	{
@@ -1064,14 +943,13 @@ Statement parseAssignment(vector<Token> *tokens, int *i)
 			assignment.validity = false;
 			assignment.message = "Expected assignment operator";
 		}
-		*i = j;
 	}
 	else
 	{
 		assignment.validity = false;
 		assignment.message = "Expected identifier";
 	}
-
+	*i = j;
 	return assignment;
 }
 
@@ -1243,9 +1121,9 @@ void testStatementTokens(vector<Statement> statements)
 
 	cout << endl
 		 << "LINE\t"
-		 << "TOKEN\t\t\t\t\t"
-		 << "VALIDITY\t\t\t"
-		 << "MESSAGE\t\t"
+		 << "TOKENS\t\t\t\t\t"
+		 //  << "VALIDITY\t\t\t"
+		 //  << "MESSAGE\t\t"
 		 << endl;
 	for (int i = 0; i < statements.size(); i++)
 	{
@@ -1258,16 +1136,17 @@ void testStatementTokens(vector<Statement> statements)
 			cout << statement.tokens[i].value << " ";
 		}
 
-		if (statement.validity)
-		{
-			cout << "Valid";
-		}
-		else
-		{
-			cout << "Invalid";
-		}
-		cout << "\t\t\t";
-		cout << statement.message << endl;
+		// if (statement.validity)
+		// {
+		// 	cout << "Valid";
+		// }
+		// else
+		// {
+		// 	cout << "Invalid";
+		// }
+		// cout << "\t\t\t";
+		// cout << statement.message
+		cout << endl;
 	}
 }
 
