@@ -515,6 +515,93 @@ void parse_rest(vector<Token> *tokens, Statement *currentStatement, int *j)
 	}
 }
 
+Statement parseFactor(vector<Token> *tokens, int *i)
+{
+	int j = *i;
+
+	Token currentToken = (*tokens)[j];
+
+	Statement factor;
+	factor.line = currentToken.line;
+	factor.syntax = "";
+	factor.validity = true;
+	factor.message = "";
+	factor.tokens;
+
+	if (currentToken.value == " ")
+	{
+	}
+
+	parse_rest(tokens, &factor, &j);
+	*i = j;
+	return factor;
+}
+
+
+
+
+Statement parseTerm(vector<Token> *tokens, int *i)
+{
+	int j = *i;
+
+	Token currentToken = (*tokens)[j];
+
+	Statement term;
+	term.line = currentToken.line;
+	term.syntax = "";
+	term.validity = true;
+	term.message = "";
+	term.tokens;
+
+	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
+	{
+		term.syntax += " " + currentToken.value;
+		term.tokens.push_back(currentToken);
+		j++;
+		currentToken = (*tokens)[j];
+
+		cout << "debug term token == " << currentToken.value << " and next token == " << (*tokens)[j + 1].value << endl;
+
+		if (currentToken.value == "*" || currentToken.value == "/")
+		{
+			term.syntax += " " + currentToken.value;
+			term.tokens.push_back(currentToken);
+			j++;
+			currentToken = (*tokens)[j];
+
+			if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
+			{
+				term.syntax += " " + currentToken.value;
+				term.tokens.push_back(currentToken);
+				j++;
+				currentToken = (*tokens)[j];
+			}
+			else
+			{
+				term.validity = false;
+				term.message = "Expected an operator";
+			}
+		}
+		else if (currentToken.value == ";" || currentToken.value == ",")
+		{
+		}
+		else
+		{
+			*i = j;
+			return term;
+		}
+	}
+	else
+	{
+		term.validity = false;
+		term.message = "Expected a term";
+	}
+
+	parse_rest(tokens, &term, &j);
+	*i = j;
+	return term;
+}
+
 Statement parseExpression(vector<Token> *tokens, int *i)
 {
 
@@ -529,28 +616,10 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 	expression.message = "";
 	expression.tokens;
 
-	// check tokens
-	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
+	if (currentToken.value == "\"") // it's a string
 	{
 
-		while (currentToken.type == CONSTANT ||
-			   currentToken.type == IDENTIFIER ||
-			   currentToken.type == ARITH_OP ||
-			   currentToken.type == REL_OP)
-		{
-			expression.syntax += " " + currentToken.value;
-			expression.tokens.push_back(currentToken);
-
-			j++;
-			if (j >= tokens->size())
-				break;
-			currentToken = (*tokens)[j];
-		}
-	}
-	else if (currentToken.value == "\"") // it's a string
-	{ 
-
-		expression.syntax += " " + currentToken.value;
+		expression.syntax += "" + currentToken.value;
 		expression.tokens.push_back(currentToken);
 		j++;
 		currentToken = (*tokens)[j];
@@ -581,10 +650,85 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 			expression.message = "Expected string constant";
 		}
 	}
+	else if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER))
+	{
+
+		cout << "debug exp token == " << currentToken.value << " and next token == " << (*tokens)[j + 1].value << endl;
+
+		Statement term = parseTerm(tokens, &j);
+
+		if (term.validity)
+		{
+			expression.syntax += " " + term.syntax;
+			expression.tokens.insert(expression.tokens.end(), term.tokens.begin(), term.tokens.end());
+			currentToken = (*tokens)[j];
+
+		cout << "debug valid term token == " << currentToken.value << " and next token == " << (*tokens)[j + 1].value << endl;
+
+
+			if (currentToken.value == "+" || currentToken.value == "-")
+			{
+				expression.syntax += " " + currentToken.value;
+				expression.tokens.push_back(currentToken);
+				j++;
+				currentToken = (*tokens)[j];
+				Statement expression2 = parseExpression(tokens, &j);
+				if (expression.validity)
+				{
+					expression.syntax += expression2.syntax;
+					expression.tokens.insert(expression.tokens.end(), expression2.tokens.begin(), expression2.tokens.end());
+				}
+				else
+				{
+					*i = j;
+					return expression;
+				}
+			}
+			else if (currentToken.value == ";" || currentToken.value == ",")
+			{
+			}
+			else
+			{
+				expression.validity = false;
+				expression.message = "Expected operator or ;";
+			}
+		}
+		else if (currentToken.value == ";" || currentToken.value == ",")
+		{
+		}
+		else
+		{
+			expression.validity = false;
+			expression.message = "Expected expression " + but_got(currentToken);
+		}
+	}
+	else if (currentToken.value == ";")
+	{
+		// expression.syntax += " " + currentToken.value;
+		// expression.tokens.push_back(currentToken);
+	}
+	else if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER) && (*tokens)[j + 1].value != ";")
+	{
+		expression.syntax += " " + currentToken.value;
+		expression.tokens.push_back(currentToken);
+		j++;
+		currentToken = (*tokens)[j];
+		Statement term = parseTerm(tokens, &j);
+		if (term.validity)
+		{
+			expression.syntax += term.syntax;
+			expression.tokens.insert(expression.tokens.end(), term.tokens.begin(), term.tokens.end());
+		}
+		else
+		{
+			expression.validity = false;
+			expression.message = "Expected constant or variable" + but_got(currentToken);
+		}
+	}
 	else
 	{
 		expression.validity = false;
-		expression.message = "Expected expression";
+		expression.message = "Expected expression" + but_got(currentToken);
 	}
 
 	parse_rest(tokens, &expression, &j);
@@ -778,6 +922,7 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 			if (variables.validity)
 			{
 				variables.syntax += variables2.syntax;
+				variables.tokens.insert(variables.tokens.end(), variables2.tokens.begin(), variables2.tokens.end());
 			}
 			else
 			{
@@ -917,21 +1062,6 @@ Statement parseAssignment(vector<Token> *tokens, int *i)
 					assignment.message = "Expected ;";
 				}
 			}
-			// if (currentToken.type == CONSTANT)
-			// {
-			// 	assignment.syntax += " " + currentToken.value;
-			// 	j++;
-			// 	currentToken = (*tokens)[j];
-			// 	if (currentToken.value == ";") // currentToken.type == DELIMITER &&
-			// 	{
-			// 		assignment.syntax += "" + currentToken.value;
-			// 	}
-			// 	else
-			// 	{
-			// 		assignment.validity = false;
-			// 		assignment.message = "Expected ;";
-			// 	}
-			// }
 			else
 			{
 				assignment.validity = false;
