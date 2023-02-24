@@ -1408,7 +1408,14 @@ void analyze(vector<Statement> *statements)
 					if (statement.tokens[i + 1].type == ASSIGN_OP) // between int x ; || ,x, || ,x= || before x = //
 					{
 						var.initialized = true;
-						// CHECK WHETHER VARIABLE WAS ALREADY DECLARED
+	
+					}
+					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ";"))
+					{
+						var.initialized = false;
+					}
+
+					// CHECK WHETHER VARIABLE WAS ALREADY DECLARED
 						if (symbol_table.count(var.name) > 0)
 						{
 							statement.validity = false;
@@ -1416,11 +1423,6 @@ void analyze(vector<Statement> *statements)
 							statement.message = " multiple declarations for identifier/variable '" + var.name + "'";
 							break;
 						}
-					}
-					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ";"))
-					{
-						var.initialized = false;
-					}
 
 					symbol_table[var.name] = {var.name, var.type, var.initialized};
 					declaredVariables.push_back(var);
@@ -1440,16 +1442,19 @@ void analyze(vector<Statement> *statements)
 
 				if (currentToken.type == IDENTIFIER)
 				{
-					if (symbol_table.count(currentToken.value) == 0)
+					var.name = currentToken.value;
+
+					if (symbol_table.count(var.name) == 0)
 					{
 						statement.validity = false;
-						statement.message = "undeclared variable '" + currentToken.value + "'";
+						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' in assignment statement not declared" << endl;
+						statement.message = "undeclared variable '" + var.name + "'";
 						break;
 					}
-					else if (!symbol_table[currentToken.value].initialized)
+					else if (!symbol_table[var.name].initialized && !(statement.tokens[i+1].type == ASSIGN_OP))
 					{
 						statement.validity = false;
-						cout << "identifier/variable'" << var.name << "' in assignment statement not initialized" << endl;
+						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' in assignment statement not initialized" << endl;
 						statement.message = "uninitialized variable '" + currentToken.value + "'";
 						break;
 					}
