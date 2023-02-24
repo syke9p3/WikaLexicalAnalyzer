@@ -20,6 +20,7 @@ Members:
 
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -408,7 +409,7 @@ void printTokens(vector<Token> tokens)
 			switch (tokens[i].type)
 			{ // TOKEN TYPE
 			case DATA_TYPE:
-				file << "DATA_TYPE"
+				file << "dataType"
 					 << "\t\t\t";
 				break;
 			case KEYWORD:
@@ -601,13 +602,10 @@ Statement parseTerm(vector<Token> *tokens, int *i)
 			term.tokens.insert(term.tokens.end(), factor.tokens.begin(), factor.tokens.end());
 			if (currentToken.value == "\"")
 			{
-
-				cout << "debug YEEHAW token " << currentToken.value << endl;
 				j++;
 				currentToken = (*tokens)[j];
 			}
 			currentToken = (*tokens)[j];
-			cout << "debug string token == " << currentToken.value << " and next token == " << (*tokens)[j + 1].value << endl;
 
 			if (currentToken.value == "*" || currentToken.value == "/")
 			{
@@ -990,7 +988,7 @@ Statement parseDeclaration(vector<Token> *tokens, int *i)
 			declaration.tokens.insert(declaration.tokens.end(), ident_list.tokens.begin(), ident_list.tokens.end());
 			currentToken = (*tokens)[j];
 
-						// Check for the presence of ;
+			// Check for the presence of ;
 			if (currentToken.value == ";")
 			{
 				declaration.syntax += currentToken.value;
@@ -1035,7 +1033,7 @@ Statement parseAssignment(vector<Token> *tokens, int *i)
 	assignment.message = "";
 
 	// <assignment> ::= <IDENTIFIER><ASSIGN_OP><EXPRESSION>
-	// c = 1;
+
 	if (currentToken.type == IDENTIFIER)
 	{
 		assignment.syntax += currentToken.value;
@@ -1084,6 +1082,8 @@ Statement parseAssignment(vector<Token> *tokens, int *i)
 		assignment.validity = false;
 		assignment.message = "Expected identifier";
 	}
+
+	assignment.type = "ASSIGNMENT";
 	*i = j;
 	return assignment;
 }
@@ -1216,6 +1216,7 @@ vector<Statement> parse(vector<Token> *tokens)
 		{
 			continue;
 		}
+
 		Statement statement = parseStatement(tokens, &i);
 		statements.push_back(statement);
 	}
@@ -1257,8 +1258,9 @@ void testStatementTokens(vector<Statement> statements)
 	cout << endl
 		 << "LINE\t"
 		 << "TOKENS\t\t\t\t\t"
-		 //  << "VALIDITY\t\t\t"
-		 //  << "MESSAGE\t\t"
+		 //   << "VALIDITY\t\t\t"
+		 //   << "MESSAGE\t\t"
+		 << "TYPE\t\t"
 		 << endl;
 	for (int i = 0; i < statements.size(); i++)
 	{
@@ -1270,7 +1272,6 @@ void testStatementTokens(vector<Statement> statements)
 		{
 			cout << statement.tokens[i].value << " ";
 		}
-
 		// if (statement.validity)
 		// {
 		// 	cout << "Valid";
@@ -1280,7 +1281,8 @@ void testStatementTokens(vector<Statement> statements)
 		// 	cout << "Invalid";
 		// }
 		// cout << "\t\t\t";
-		// cout << statement.message
+		// cout << statement.message;
+		cout << statement.type;
 		cout << endl;
 	}
 
@@ -1291,44 +1293,248 @@ void testStatementTokens(vector<Statement> statements)
 		file << endl
 			 << "LINE\t\t\t"
 			 << "INDEX\t\t\t"
-			 << "TOKEN\t\t\t\t"
-			 << "TYPE\t\t\t"
-			 << "DESCRIPTION\t\t"
+			 << "TOKENS\t\t\t\t"
+			 << "MESSAGE\t\t\t"
 			 << endl;
 		for (int i = 0; i < statements.size(); i++)
-	{
-		Statement statement = statements[i];
-
-		file << statement.line << "\t";
-
-		for (int i = 0; i < statement.tokens.size(); i++)
 		{
-			file << statement.tokens[i].value << " ";
-		}
+			Statement statement = statements[i];
 
-		if (statement.validity)
-		{
-			file << "Valid"; 
+			file << statement.line << "\t";
+
+			for (int i = 0; i < statement.tokens.size(); i++)
+			{
+				file << statement.tokens[i].value << " ";
+			}
+
+			if (statement.validity)
+			{
+				file << "Valid";
+			}
+			else
+			{
+				file << "Invalid";
+			}
+			file << "\t\t\t";
+			file << statement.message;
+			file << endl;
 		}
-		else
-		{
-			file << "Invalid";
-		}
-		file << "\t\t\t";
-		file << statement.message;
-		file << endl;
 	}
-	}
-	cout << ">> Generating syntax tree..." << endl
-		 << endl;
-	cout << ">> Output file generated: " << outputFileParser << endl
-		 << endl;
+	// cout << ">> Generating syntax tree..." << endl
+	// 	 << endl;
+	// cout << ">> Output file generated: " << outputFileParser << endl
+	// 	 << endl;
 	file.close();
+}
+
+/*============================================= SEMANTIC ANALYSIS ================================================*/
+
+enum DataType
+{
+	INT,
+	STRING,
+	BOOL,
+	FLOAT
+};
+
+struct Variable
+{
+	string name;
+	DataType type;
+	bool initialized = false;
+};
+
+unordered_map<string, Variable> symbol_table;
+
+// void analyze(vector<Statement> *statement)
+// {
+// 	vector<Statement> statements;
+
+// 	// Loop through the whole statement vector
+// 	for (int i = 0; i < (*statement).size(); i++)
+// 	{
+// 		Statement currentStatement = (*statement)[i];
+
+// 		// Semantic checks
+
+// 		if (currentStatement.type == "DECLARATION") {
+
+// 		}
+
+// 	}
+
+// }
+
+void analyze(vector<Statement> *statements)
+{
+	for (Statement statement : *statements)
+	{
+		vector<Variable> declaredVariables;
+
+		if (statement.type == "DECLARATION")
+		{
+			Variable var;
+			var.type;
+			var.name;
+			var.initialized;
+
+			for (int i = 0; i < statement.tokens.size(); i++) // Read each tokens of each statement
+			{
+				Token currentToken = (statement.tokens)[i];
+
+				if (currentToken.type == DATA_TYPE)
+				{
+					if (currentToken.value == "int")
+					{
+						var.type = INT;
+					}
+					else if (currentToken.value == "string")
+					{
+						var.type = STRING;
+					}
+					else if (currentToken.value == "bool")
+					{
+						var.type = BOOL;
+					}
+					else if (currentToken.value == "float")
+					{
+						var.type = FLOAT;
+					}
+				}
+				else if (currentToken.type == IDENTIFIER)
+				{
+					var.name = currentToken.value;
+
+					if (statement.tokens[i + 1].type == ASSIGN_OP) // between int x ; || ,x, || ,x= || before x = //
+					{
+						var.initialized = true;
+						// CHECK WHETHER VARIABLE WAS ALREADY DECLARED
+						if (symbol_table.count(var.name) > 0)
+						{
+							statement.validity = false;
+							cout << "Line " << statement.line << " : multiple declarations for identifier/variable '" + var.name + "'" << endl;
+							statement.message = " multiple declarations for identifier/variable '" + var.name + "'";
+							break;
+						}
+					}
+					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ";"))
+					{
+						var.initialized = false;
+					}
+
+					symbol_table[var.name] = {var.name, var.type, var.initialized};
+					declaredVariables.push_back(var);
+				}
+			}
+		}
+		else if (statement.type == "ASSIGNMENT")
+		{
+			Variable var;
+			var.type;
+			var.name;
+			var.initialized;
+
+			for (int i = 0; i < statement.tokens.size(); i++) // Read each tokens of each statement
+			{
+				Token currentToken = (statement.tokens)[i];
+
+				if (currentToken.type == IDENTIFIER)
+				{
+					if (symbol_table.count(currentToken.value) == 0)
+					{
+						statement.validity = false;
+						statement.message = "undeclared variable '" + currentToken.value + "'";
+						break;
+					}
+					else if (!symbol_table[currentToken.value].initialized)
+					{
+						statement.validity = false;
+						cout << "identifier/variable'" << var.name << "' in assignment statement not initialized" << endl;
+						statement.message = "uninitialized variable '" + currentToken.value + "'";
+						break;
+					}
+				}
+				else if (statement.tokens[i+1].type == ASSIGN_OP)
+				{
+					symbol_table[currentToken.value].initialized = true;
+				}
+			}
+		}
+		// else if (statement.type == "ASSIGNMENT")
+		// {
+
+		// 	Variable var;
+		// 	var.type;
+		// 	var.name = statement.tokens[0].value;
+		// 	// CHECK IF VARIABLE IS NOT DECLARED
+		// 	if (symbol_table.count(var.name) == 0)
+		// 	{
+		// 		statement.validity = false;
+		// 		cout << "identifier/variable '" << var.name << "' not declared" << endl;
+		// 		statement.message = "identifier/variable '" + var.name + "' not declared";
+		// 		continue;
+		// 	}
+
+		// 	if (symbol_table[var.name].initialized == false)
+		// 	{
+		// 		statement.validity = false;
+		// 		cout << "identifier/variable in assignment statement '" << var.name << "' not initialized" << endl;
+		// 		statement.message = "variable '" + var.name + "' not initialized";
+		// 		continue;
+		// 	}
+
+		// 	DataType variable_type = symbol_table[var.name].type;
+		// 	Token value_token = statement.tokens[2];
+		// 	if (value_token.type == TokenType::IDENTIFIER)
+		// 	{
+		// 		string value_varName = value_token.value;
+		// 		if (symbol_table.count(value_varName) == 0)
+		// 		{
+		// 			statement.validity = false;
+		// 			statement.message = "identifier/variable valvar'" + value_varName + "' not declared";
+		// 			continue;
+		// 		}
+		// 		DataType value_variable_type = symbol_table[value_varName].type;
+		// 		if (value_variable_type != variable_type)
+		// 		{
+		// 			statement.validity = false;
+		// 			statement.message = "variable initialization type mismatched";
+		// 			continue;
+		// 		}
+		// 	}
+		// 	// Handle other cases for checking type mismatch
+		// 	symbol_table[var.name].initialized = true;
+
+		// 	for (const auto &entry : symbol_table)
+		// 	{
+		// 		const string &varName = entry.first;
+		// 		const Variable &variable = entry.second;
+
+		// 		cout << "Variable name: " << varName << ", type: " << (int)variable.type << ", initialized: " << variable.initialized << endl;
+		// 	}
+		// }
+		// Check for uninitialized variables
+		for (Variable var : declaredVariables)
+		{
+
+			// if (!symbol_table[var].initialized)
+			// {
+			// 	statement.validity = false;
+			// 	cout << "uninitialized variable '" << var << "'" << endl;
+			// 	statement.message = "uninitialized variable '" + var + "'";
+			// 	break;
+			// }
+		}
+	}
+	cout << "VARIABLE SYMBOL TABLE CONTENTS: " << endl;
+	for (auto &pair : symbol_table)
+	{
+		std::cout << pair.first << ", data type id: " << pair.second.type << " (initialized: " << pair.second.initialized << ")" << std::endl;
+	}
 }
 
 int main()
 {
-
 	string input = "";
 	ifstream file(fileName);
 
@@ -1360,8 +1566,9 @@ int main()
 			vector<Token> tokens = tokenize(input);
 			printTokens(tokens);
 			vector<Statement> statements = parse(&tokens);
-			printSyntax(statements);
 			testStatementTokens(statements);
+			// printSyntax(statements);
+			analyze(&statements);
 		}
 		else
 		{
