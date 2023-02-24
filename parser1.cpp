@@ -1447,14 +1447,14 @@ void analyze(vector<Statement> *statements)
 					if (symbol_table.count(var.name) == 0)
 					{
 						statement.validity = false;
-						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' in assignment statement not declared" << endl;
+						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' not declared" << endl;
 						statement.message = "undeclared variable '" + var.name + "'";
 						break;
 					}
 					else if (!symbol_table[var.name].initialized && !(statement.tokens[i+1].type == ASSIGN_OP))
 					{
 						statement.validity = false;
-						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' in assignment statement not initialized" << endl;
+						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' not initialized" << endl;
 						statement.message = "uninitialized variable '" + currentToken.value + "'";
 						break;
 					}
