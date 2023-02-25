@@ -33,6 +33,14 @@ string outputFileParser = "output_Parser.wika";
 
 /*============================= LEXER ========================================================================*/
 
+void debug(string varName = " ", string value = " ", string location = " ")
+{
+
+	string debug;
+	debug = "debug " + varName + " : " + value + " in " + location;
+	cout << debug << endl;
+}
+
 enum TokenType
 {
 	DATA_TYPE,
@@ -1405,24 +1413,54 @@ void analyze(vector<Statement> *statements)
 				{
 					var.name = currentToken.value;
 
-					if (statement.tokens[i + 1].type == ASSIGN_OP) // between int x ; || ,x, || ,x= || before x = //
+					if (statement.tokens[i + 1].type == ASSIGN_OP) // identifier is before assign_op
 					{
 						var.initialized = true;
-	
 					}
-					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ";"))
+					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ";") || // between data type and ; )(int x;)
+							 (statement.tokens[i - 1].value == "," && statement.tokens[i + 1].value == ",") ||		// between commas , ,)(,x,)
+							 (statement.tokens[i - 1].value == "," && statement.tokens[i + 1].value == ";"))		// between , and ;)(,z;)
+
 					{
 						var.initialized = false;
 					}
+					else
+					{
+						int j = i;
+						currentToken = (statement.tokens)[j];
+						while (currentToken.value != "," && currentToken.value != ";")
+						{
+							if (currentToken.value == var.name && symbol_table.count(var.name) == 0)
+							{
+								statement.validity = false;
+								cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not declared" << endl;
+								statement.message = "undeclared variable '" + currentToken.value + "'";
+							}
+							else if (currentToken.value == var.name && symbol_table.count(currentToken.value) > 0)
+							{
+								Variable variable = symbol_table[currentToken.value];
+								if (!variable.initialized)
+								{
+									cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not initialized" << endl;
+									statement.message = "uninitialized variable '" + currentToken.value + "'";
+								}
+							}
+
+							j++;
+							currentToken = (statement.tokens)[j];
+						}
+						// i = j;
+						continue;
+					}
 
 					// CHECK WHETHER VARIABLE WAS ALREADY DECLARED
-						if (symbol_table.count(var.name) > 0)
-						{
-							statement.validity = false;
-							cout << "Line " << statement.line << " : multiple declarations for identifier/variable '" + var.name + "'" << endl;
-							statement.message = " multiple declarations for identifier/variable '" + var.name + "'";
-							break;
-						}
+					if (symbol_table.count(var.name) > 0)
+					{
+						statement.validity = false;
+						cout << "Line " << statement.line << " : multiple declarations for identifier/variable '" + var.name + "'" << endl;
+						statement.message = " multiple declarations for identifier/variable '" + var.name + "'";
+						continue;
+					}
 
 					symbol_table[var.name] = {var.name, var.type, var.initialized};
 					declaredVariables.push_back(var);
@@ -1451,7 +1489,7 @@ void analyze(vector<Statement> *statements)
 						statement.message = "undeclared variable '" + var.name + "'";
 						break;
 					}
-					else if (!symbol_table[var.name].initialized && !(statement.tokens[i+1].type == ASSIGN_OP))
+					else if (!symbol_table[var.name].initialized && !(statement.tokens[i + 1].type == ASSIGN_OP))
 					{
 						statement.validity = false;
 						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' not initialized" << endl;
@@ -1459,7 +1497,7 @@ void analyze(vector<Statement> *statements)
 						break;
 					}
 				}
-				else if (statement.tokens[i+1].type == ASSIGN_OP)
+				else if (statement.tokens[i + 1].type == ASSIGN_OP)
 				{
 					symbol_table[currentToken.value].initialized = true;
 				}
