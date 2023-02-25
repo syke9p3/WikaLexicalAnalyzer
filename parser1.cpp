@@ -24,6 +24,7 @@ Members:
 #include <string>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -40,6 +41,14 @@ void debug(string varName = " ", string value = " ")
 	debug = "debug " + varName + " : " + value;
 	cout << debug << endl;
 }
+
+struct Error
+{
+	int line;
+	string message;
+};
+
+vector<Error> errors;
 
 enum TokenType
 {
@@ -135,8 +144,6 @@ unordered_map<string, Token> tokenTypeMap = {
 
 };
 
-vector<string> errors;
-
 void unrecognizedToken(string token, int index)
 {
 	cout << "unrecognized token " << token << " on input string index " << index << endl;
@@ -210,7 +217,7 @@ vector<Token> tokenize(string input)
 				if (input[i] != '*' && input[i] + 1 != '/')
 				{
 					// print the error message
-					errors.push_back("\u001b[38;5;208m" + fileName + ": error: missing terminating */" + " on line " + to_string(line) + " column " + to_string(col) + "\033[0m\n\t");
+					// errors.push_back("\u001b[38;5;208m" + fileName + ": error: missing terminating */" + " on line " + to_string(line) + " column " + to_string(col) + "\033[0m\n\t");
 
 					// return the tokens
 					return tokens;
@@ -337,7 +344,7 @@ vector<Token> tokenize(string input)
 			if (input[i] != '"')
 			{
 				// print the error message
-				errors.push_back("\u001b[38;5;208m" + fileName + ": error: missing terminating \" character" + " on line " + to_string(line) + " column " + to_string(col) + "\033[0m\n\t");
+				// errors.push_back("\u001b[38;5;208m" + fileName + ": error: missing terminating \" character" + " on line " + to_string(line) + " column " + to_string(col) + "\033[0m\n\t");
 
 				// return the tokens
 				return tokens;
@@ -914,12 +921,12 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 					{
 						variables.syntax += variables2.syntax;
 						variables.tokens.push_back(currentToken);
-						variables.tokens.insert(variables.tokens.end(), variables2.tokens.begin(), variables2.tokens.end());
 					}
 					else
 					{
 						variables.validity = false;
-						variables.message = variables.message;
+						variables.message = variables2.message;
+						errors.push_back({variables.line, variables.message});
 					}
 				}
 			}
@@ -927,6 +934,7 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 			{
 				variables.validity = false;
 				variables.message = expression.message;
+				errors.push_back({variables.line, variables.message});
 			}
 		}
 		else if (currentToken.value == ",")
@@ -946,6 +954,7 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 			{
 				variables.validity = false;
 				variables.message = variables.message;
+				errors.push_back({variables.line, variables.message});
 			}
 		}
 		else
@@ -957,7 +966,7 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 	else
 	{
 		variables.validity = false;
-		variables.message = "Expected identifier ";
+		variables.message = "Expected identifier " + but_got(currentToken);
 	}
 
 	*i = j;
@@ -1006,18 +1015,21 @@ Statement parseDeclaration(vector<Token> *tokens, int *i)
 			{
 				declaration.validity = false;
 				declaration.message = "Expected ; " + but_got(currentToken);
+				errors.push_back({declaration.line, declaration.message});
 			}
 		}
 		else
 		{
 			declaration.validity = false;
 			declaration.message = ident_list.message;
+			errors.push_back({declaration.line, declaration.message});
 		}
 	}
 	else
 	{
 		declaration.validity = false;
 		declaration.message = "Expected data type " + but_got(currentToken);
+		errors.push_back({declaration.line, declaration.message});
 	}
 
 	parse_rest(tokens, &declaration, &j);
@@ -1069,26 +1081,32 @@ Statement parseAssignment(vector<Token> *tokens, int *i)
 				else
 				{
 					assignment.validity = false;
-					assignment.message = "Expected ;";
+					assignment.message = "Expected ;" + but_got(currentToken);
+					errors.push_back({assignment.line, assignment.message});
 				}
 			}
 			else
 			{
 				assignment.validity = false;
-				assignment.message = "Expected constant/expression";
+				assignment.message = "Expected constant/expression" + but_got(currentToken);
+				errors.push_back({assignment.line, assignment.message});
 			}
 		}
 		else
 		{
 			assignment.validity = false;
-			assignment.message = "Expected assignment operator";
+			assignment.message = "Expected assignment operator" + but_got(currentToken);
+			errors.push_back({assignment.line, assignment.message});
 		}
 	}
 	else
 	{
 		assignment.validity = false;
-		assignment.message = "Expected identifier";
+		assignment.message = "Expected identifier" + but_got(currentToken);
+		errors.push_back({assignment.line, assignment.message});
 	}
+
+	cout << " ASSGN LINE " << assignment.line << endl;
 
 	assignment.type = "ASSIGNMENT";
 	*i = j;
@@ -1427,8 +1445,8 @@ void analyze(vector<Statement> *statements)
 						while (currentToken.value != "," && currentToken.value != ";")
 						{
 							// check if token is identifier or constant
-							if (currentToken.type == CONSTANT) 
-							{ 
+							if (currentToken.type == CONSTANT)
+							{
 								string dataType = checkDataType((statement.tokens)[j]);
 
 								if ((var.type == "int" && dataType == "int") ||
@@ -1440,11 +1458,12 @@ void analyze(vector<Statement> *statements)
 								else
 								{
 									cout << "Line " << statement.line << " : Invalid conversion from '" << dataType << "' to '" << var.type << endl;
+									statement.message = "Invalid conversion from '" + dataType + "' to '" + var.type;
+									errors.push_back({statement.line, statement.message});
 								}
 							}
 							else if (currentToken.type == IDENTIFIER) // it's a variable so we check its data type instead
 							{
-								
 							}
 
 							j++;
@@ -1470,7 +1489,8 @@ void analyze(vector<Statement> *statements)
 							{
 								statement.validity = false;
 								cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not declared" << endl;
-								statement.message = "undeclared variable '" + currentToken.value + "'";
+								statement.message = "Undeclared variable '" + currentToken.value + "'";
+								errors.push_back({statement.line, statement.message});
 							}
 							else if (currentToken.value == var.name && symbol_table.count(currentToken.value) > 0)
 							{
@@ -1478,7 +1498,8 @@ void analyze(vector<Statement> *statements)
 								if (!variable.initialized)
 								{
 									cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not initialized" << endl;
-									statement.message = "uninitialized variable '" + currentToken.value + "'";
+									statement.message = "Uninitialized variable '" + currentToken.value + "'";
+									errors.push_back({statement.line, statement.message});
 								}
 							}
 
@@ -1492,8 +1513,9 @@ void analyze(vector<Statement> *statements)
 					if (symbol_table.count(var.name) > 0)
 					{
 						statement.validity = false;
-						cout << "Line " << statement.line << " : multiple declarations for identifier/variable '" + var.name + "'" << endl;
-						statement.message = " multiple declarations for identifier/variable '" + var.name + "'";
+						cout << "Line " << statement.line << " : Multiple declarations for identifier/variable '" + var.name + "'" << endl;
+						statement.message = "Multiple declarations for identifier/variable '" + var.name + "'";
+						errors.push_back({statement.line, statement.message});
 						continue;
 					}
 
@@ -1521,7 +1543,8 @@ void analyze(vector<Statement> *statements)
 					{
 						statement.validity = false;
 						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' not declared" << endl;
-						statement.message = "undeclared variable '" + var.name + "'";
+						statement.message = "Undeclared variable '" + var.name + "'";
+						errors.push_back({statement.line, statement.message});
 						break;
 					}
 					else if (symbol_table.count(currentToken.value) > 0)
@@ -1530,7 +1553,8 @@ void analyze(vector<Statement> *statements)
 						if (!variable.initialized)
 						{
 							cout << "Line " << statement.line << " : variable '" << currentToken.value << "' not initialized" << endl;
-							statement.message = "uninitialized variable '" + currentToken.value + "'";
+							statement.message = "Uninitialized variable '" + currentToken.value + "'";
+							errors.push_back({statement.line, statement.message});
 						}
 					}
 				}
@@ -1542,6 +1566,22 @@ void analyze(vector<Statement> *statements)
 	for (auto &pair : symbol_table)
 	{
 		std::cout << pair.first << ", data type id: " << pair.second.type << " (initialized: " << pair.second.initialized << ")" << std::endl;
+	}
+}
+
+
+
+void printErrors(vector<Error> errors)
+{
+
+	sort(errors.begin(), errors.end(), [](const Error &e1, const Error &e2)
+		 { return e1.line < e2.line; });
+
+	cout << "\n\n"
+		 << "ERRORS" << endl;
+	for (const auto &error : errors)
+	{
+		cout << "Line " << error.line << " :\t" << error.message << endl;
 	}
 }
 
@@ -1581,6 +1621,7 @@ int main()
 			testStatementTokens(statements);
 			// printSyntax(statements);
 			analyze(&statements);
+			printErrors(errors);
 		}
 		else
 		{
