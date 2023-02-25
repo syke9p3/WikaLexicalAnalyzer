@@ -20,7 +20,7 @@ Members:
 
 #include <iostream>
 #include <unordered_map>
-#include <unordered_set>
+#include <map>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -33,11 +33,11 @@ string outputFileParser = "output_Parser.wika";
 
 /*============================= LEXER ========================================================================*/
 
-void debug(string varName = " ", string value = " ", string location = " ")
+void debug(string varName = " ", string value = " ")
 {
 
 	string debug;
-	debug = "debug " + varName + " : " + value + " in " + location;
+	debug = "debug " + varName + " : " + value;
 	cout << debug << endl;
 }
 
@@ -205,7 +205,6 @@ vector<Token> tokenize(string input)
 				while (input[i] != '*' && input[i] != '/' && input[i] != EOF)
 				{
 					tokenValue += input[i];
-					cout << "tokenvalue: " << tokenValue << endl;
 					i++;
 				}
 				if (input[i] != '*' && input[i] + 1 != '/')
@@ -1280,19 +1279,11 @@ void testStatementTokens(vector<Statement> statements)
 		{
 			cout << statement.tokens[i].value << " ";
 		}
-		// if (statement.validity)
-		// {
-		// 	cout << "Valid";
-		// }
-		// else
-		// {
-		// 	cout << "Invalid";
-		// }
-		// cout << "\t\t\t";
-		// cout << statement.message;
+		cout << "\t\t\t\t";
 		cout << statement.type;
 		cout << endl;
 	}
+	cout << "\n\n";
 
 	ofstream file(outputFileParser);
 	if (file.is_open())
@@ -1342,36 +1333,24 @@ enum DataType
 	INT,
 	STRING,
 	BOOL,
-	FLOAT
+	FLOAT,
+	OP
+};
+
+struct Expression
+{
+	map<Token, DataType> expression;
 };
 
 struct Variable
 {
 	string name;
-	DataType type;
+	string type;
 	bool initialized = false;
+	Expression value;
 };
 
 unordered_map<string, Variable> symbol_table;
-
-// void analyze(vector<Statement> *statement)
-// {
-// 	vector<Statement> statements;
-
-// 	// Loop through the whole statement vector
-// 	for (int i = 0; i < (*statement).size(); i++)
-// 	{
-// 		Statement currentStatement = (*statement)[i];
-
-// 		// Semantic checks
-
-// 		if (currentStatement.type == "DECLARATION") {
-
-// 		}
-
-// 	}
-
-// }
 
 void analyze(vector<Statement> *statements)
 {
@@ -1385,6 +1364,7 @@ void analyze(vector<Statement> *statements)
 			var.type;
 			var.name;
 			var.initialized;
+			var.value;
 
 			for (int i = 0; i < statement.tokens.size(); i++) // Read each tokens of each statement
 			{
@@ -1394,19 +1374,19 @@ void analyze(vector<Statement> *statements)
 				{
 					if (currentToken.value == "int")
 					{
-						var.type = INT;
+						var.type = "int";
 					}
 					else if (currentToken.value == "string")
 					{
-						var.type = STRING;
+						var.type = "string";
 					}
 					else if (currentToken.value == "bool")
 					{
-						var.type = BOOL;
+						var.type = "bool";
 					}
 					else if (currentToken.value == "float")
 					{
-						var.type = FLOAT;
+						var.type = "float";
 					}
 				}
 				else if (currentToken.type == IDENTIFIER)
@@ -1418,14 +1398,17 @@ void analyze(vector<Statement> *statements)
 						var.initialized = true;
 					}
 					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ";") || // between data type and ; )(int x;)
+							 (statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ",") || // between data type and ; )(int x;)
 							 (statement.tokens[i - 1].value == "," && statement.tokens[i + 1].value == ",") ||		// between commas , ,)(,x,)
 							 (statement.tokens[i - 1].value == "," && statement.tokens[i + 1].value == ";"))		// between , and ;)(,z;)
 
 					{
+
 						var.initialized = false;
 					}
 					else
 					{
+
 						int j = i;
 						currentToken = (statement.tokens)[j];
 						while (currentToken.value != "," && currentToken.value != ";")
@@ -1489,87 +1472,21 @@ void analyze(vector<Statement> *statements)
 						statement.message = "undeclared variable '" + var.name + "'";
 						break;
 					}
-					else if (!symbol_table[var.name].initialized && !(statement.tokens[i + 1].type == ASSIGN_OP))
+					else if (symbol_table.count(currentToken.value) > 0)
 					{
-						statement.validity = false;
-						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' not initialized" << endl;
-						statement.message = "uninitialized variable '" + currentToken.value + "'";
-						break;
+						Variable variable = symbol_table[currentToken.value];
+						if (!variable.initialized)
+						{
+							cout << "Line " << statement.line << " : variable '" << currentToken.value << "' not initialized" << endl;
+							statement.message = "uninitialized variable '" + currentToken.value + "'";
+						}
 					}
-				}
-				else if (statement.tokens[i + 1].type == ASSIGN_OP)
-				{
-					symbol_table[currentToken.value].initialized = true;
 				}
 			}
 		}
-		// else if (statement.type == "ASSIGNMENT")
-		// {
-
-		// 	Variable var;
-		// 	var.type;
-		// 	var.name = statement.tokens[0].value;
-		// 	// CHECK IF VARIABLE IS NOT DECLARED
-		// 	if (symbol_table.count(var.name) == 0)
-		// 	{
-		// 		statement.validity = false;
-		// 		cout << "identifier/variable '" << var.name << "' not declared" << endl;
-		// 		statement.message = "identifier/variable '" + var.name + "' not declared";
-		// 		continue;
-		// 	}
-
-		// 	if (symbol_table[var.name].initialized == false)
-		// 	{
-		// 		statement.validity = false;
-		// 		cout << "identifier/variable in assignment statement '" << var.name << "' not initialized" << endl;
-		// 		statement.message = "variable '" + var.name + "' not initialized";
-		// 		continue;
-		// 	}
-
-		// 	DataType variable_type = symbol_table[var.name].type;
-		// 	Token value_token = statement.tokens[2];
-		// 	if (value_token.type == TokenType::IDENTIFIER)
-		// 	{
-		// 		string value_varName = value_token.value;
-		// 		if (symbol_table.count(value_varName) == 0)
-		// 		{
-		// 			statement.validity = false;
-		// 			statement.message = "identifier/variable valvar'" + value_varName + "' not declared";
-		// 			continue;
-		// 		}
-		// 		DataType value_variable_type = symbol_table[value_varName].type;
-		// 		if (value_variable_type != variable_type)
-		// 		{
-		// 			statement.validity = false;
-		// 			statement.message = "variable initialization type mismatched";
-		// 			continue;
-		// 		}
-		// 	}
-		// 	// Handle other cases for checking type mismatch
-		// 	symbol_table[var.name].initialized = true;
-
-		// 	for (const auto &entry : symbol_table)
-		// 	{
-		// 		const string &varName = entry.first;
-		// 		const Variable &variable = entry.second;
-
-		// 		cout << "Variable name: " << varName << ", type: " << (int)variable.type << ", initialized: " << variable.initialized << endl;
-		// 	}
-		// }
-		// Check for uninitialized variables
-		for (Variable var : declaredVariables)
-		{
-
-			// if (!symbol_table[var].initialized)
-			// {
-			// 	statement.validity = false;
-			// 	cout << "uninitialized variable '" << var << "'" << endl;
-			// 	statement.message = "uninitialized variable '" + var + "'";
-			// 	break;
-			// }
-		}
 	}
-	cout << "VARIABLE SYMBOL TABLE CONTENTS: " << endl;
+	cout << "\n\n"
+		 << "VARIABLE SYMBOL TABLE CONTENTS: " << endl;
 	for (auto &pair : symbol_table)
 	{
 		std::cout << pair.first << ", data type id: " << pair.second.type << " (initialized: " << pair.second.initialized << ")" << std::endl;
