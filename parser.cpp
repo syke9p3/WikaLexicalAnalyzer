@@ -481,7 +481,7 @@ void parse_rest(vector<Token> *tokens, Statement *currentStatement, int *j)
 	{
 		if (currentToken.value != "\n" && !((*currentStatement).validity))
 		{
-			//tokens that does not need space
+			// tokens that does not need space
 			if (currentToken.type == SEMICOLON ||
 				currentToken.type == CONSTANT ||
 				currentToken.type == DELIMITER ||
@@ -740,12 +740,10 @@ void printSyntax(vector<Statement> statements)
 		{
 			cout << "Invalid";
 		}
-			cout << "\t\t\t";
+		cout << "\t\t\t";
 		cout << statement.message << endl;
 	}
 }
-
-
 
 int main()
 {
@@ -790,4 +788,42 @@ int main()
 	}
 
 	return 0;
+}
+
+void func()
+{
+// 	if (statement.type == "ASSIGNMENT")
+// 	{
+// 		Variable var;
+// 		var.type;
+// 		var.name;
+// 		var.initialized;
+
+// 		for (int i = 0; i < statement.tokens.size(); i++) // Read each tokens of each statement
+// 		{
+// 			Token currentToken = (statement.tokens)[i];
+
+// 			if (currentToken.type == IDENTIFIER)
+// 			{
+// 				var.name = currentToken.value;
+
+// 				if (symbol_table.count(var.name) == 0)
+// 				{
+// 					statement.validity = false;
+// 					cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' not declared" << endl;
+// 					statement.message = "undeclared variable '" + var.name + "'";
+// 					break;
+// 				}
+// 				else if (symbol_table.count(currentToken.value) > 0)
+// 				{
+// 					Variable variable = symbol_table[currentToken.value];
+// 					if (!variable.initialized)
+// 					{
+// 						cout << "Line " << statement.line << " : variable '" << currentToken.value << "' not initialized" << endl;
+// 						statement.message = "uninitialized variable '" + currentToken.value + "'";
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
 }

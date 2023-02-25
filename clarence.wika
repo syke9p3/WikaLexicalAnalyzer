@@ -1,9 +1,12 @@
-int y;
-int y;
-int a;
-string x = "hello";
-int c = 4;
-
-y = 5  + a + y;
-z = 5;
-
+int x = 9 + "Hello";
+int x = 30 + 1.5;
+int x = 30;
+y = x + 4;
+int keyword = habang + 1; 
+int b;
+b = x + 8;
+int repeat;
+float repeat;
+string name = "hello"; 
+int age = 1 + year, a;
+year = age;

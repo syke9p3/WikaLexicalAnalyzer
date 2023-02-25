@@ -753,7 +753,7 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 	else
 	{
 		expression.validity = false;
-		expression.message = "Expected expression" + but_got(currentToken);
+		expression.message = "Expected expression " + but_got(currentToken);
 	}
 
 	parse_rest(tokens, &expression, &j);
@@ -926,7 +926,7 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 					{
 						variables.validity = false;
 						variables.message = variables2.message;
-						errors.push_back({variables.line, variables.message});
+						// errors.push_back({variables.line, variables.message});
 					}
 				}
 			}
@@ -934,7 +934,7 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 			{
 				variables.validity = false;
 				variables.message = expression.message;
-				errors.push_back({variables.line, variables.message});
+				// errors.push_back({variables.line, variables.message});
 			}
 		}
 		else if (currentToken.value == ",")
@@ -954,7 +954,7 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 			{
 				variables.validity = false;
 				variables.message = variables.message;
-				errors.push_back({variables.line, variables.message});
+				// errors.push_back({variables.line, variables.message});
 			}
 		}
 		else
@@ -1136,28 +1136,28 @@ Statement parseStatement(vector<Token> *tokens, int *i)
 	case IDENTIFIER:
 		statement = parseAssignment(tokens, i);
 		break;
-	case CONSTANT:
-		statement = parseExpression(tokens, i);
-		if (statement.validity)
-		{
-			currentToken = (*tokens)[*i];
+	// case CONSTANT:
+	// 	statement = parseExpression(tokens, i);
+	// 	if (statement.validity)
+	// 	{
+	// 		currentToken = (*tokens)[*i];
 
-			if (currentToken.type == SEMICOLON)
-			{
-				statement.syntax += currentToken.value;
-			}
-			else
-			{
-				statement.validity = false;
-				statement.message = "Expected ; " + but_got(currentToken);
-			}
-		}
-		else
-		{
-			statement.validity = false;
-			statement.message = statement.message;
-		}
-		break;
+	// 		if (currentToken.type == SEMICOLON)
+	// 		{
+	// 			statement.syntax += currentToken.value;
+	// 		}
+	// 		else
+	// 		{
+	// 			statement.validity = false;
+	// 			statement.message = "Expected ; " + but_got(currentToken);
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		statement.validity = false;
+	// 		statement.message = statement.message;
+	// 	}
+	// 	break;
 	case COMMENT:
 		statement.line = currentToken.line;
 		statement.syntax = currentToken.value;
@@ -1189,38 +1189,51 @@ Statement parseStatement(vector<Token> *tokens, int *i)
 		// 	}
 		break;
 	default:
-		int j = *i;
-		Statement invalidStatement;
-		while (j < (*tokens).size())
+		if (currentToken.type == CONSTANT)
 		{
-			// read the rest of the line until newline is encountered
-			if (currentToken.value != "\n")
-			{
-				if (currentToken.type == SEMICOLON ||
-					currentToken.type == CONSTANT ||
-					currentToken.type == DELIMITER ||
-					currentToken.type == ARITH_OP ||
-					currentToken.type == REL_OP ||
-					currentToken.type == LOG_OP)
-				{
-					invalidStatement.syntax += currentToken.value;
-				}
-				else
-				{
-					invalidStatement.syntax += currentToken.value + " ";
-				}
-				j++;
-				currentToken = (*tokens)[j];
-			}
-			else
-			{
-				statement.line = currentToken.line;
-				statement.syntax = invalidStatement.syntax;
-				statement.validity = false;
-				statement.message = "Unexpected token";
-				*i = j;
-				break;
-			}
+			cout << "I expect " << currentToken.value << endl;
+		}
+		// int j = *i;
+		// Statement invalidStatement;
+		// while (j < (*tokens).size())
+		// {
+		// 	// read the rest of the line until newline is encountered
+		// 	if (currentToken.value != "\n")
+		// 	{
+		// 		if (currentToken.type == SEMICOLON ||
+		// 			currentToken.type == CONSTANT ||
+		// 			currentToken.type == DELIMITER ||
+		// 			currentToken.type == ARITH_OP ||
+		// 			currentToken.type == REL_OP ||
+		// 			currentToken.type == LOG_OP)
+		// 		{
+		// 			invalidStatement.syntax += currentToken.value;
+		// 		}
+		// 		else
+		// 		{
+		// 			invalidStatement.syntax += currentToken.value + " ";
+		// 		}
+		// 		j++;
+		// 		currentToken = (*tokens)[j];
+		// 	}
+		// 	else
+		// 	{
+		// 		statement.line = currentToken.line;
+		// 		statement.syntax = invalidStatement.syntax;
+		// 		statement.validity = false;
+		// 		statement.message = "Unexpected token " + stringify(currentToken.type) + " '" + currentToken.value + "'";
+
+		// 		break;
+		// 	}
+		// 	*i = j;
+		// }
+
+		statement.line = currentToken.line;
+		statement.validity = false;
+		statement.message = "Unexpected token " + stringify(currentToken.type) + " '" + currentToken.value + "'";
+		if (currentToken.value != "\n")
+		{
+			// errors.push_back({statement.line, statement.message});
 		}
 		break;
 	}
@@ -1458,8 +1471,9 @@ void analyze(vector<Statement> *statements)
 								else
 								{
 									cout << "Line " << statement.line << " : Invalid conversion from '" << dataType << "' to '" << var.type << endl;
-									statement.message = "Invalid conversion from '" + dataType + "' to '" + var.type;
+									statement.message = "Invalid conversion from '" + dataType + "' to '" + var.type + "'";
 									errors.push_back({statement.line, statement.message});
+									break;
 								}
 							}
 							else if (currentToken.type == IDENTIFIER) // it's a variable so we check its data type instead
@@ -1489,7 +1503,7 @@ void analyze(vector<Statement> *statements)
 							{
 								statement.validity = false;
 								cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not declared" << endl;
-								statement.message = "Undeclared variable '" + currentToken.value + "'";
+								statement.message = "Identifier/variable  '" + currentToken.value + "' is not declared";
 								errors.push_back({statement.line, statement.message});
 							}
 							else if (currentToken.value == var.name && symbol_table.count(currentToken.value) > 0)
@@ -1498,7 +1512,7 @@ void analyze(vector<Statement> *statements)
 								if (!variable.initialized)
 								{
 									cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not initialized" << endl;
-									statement.message = "Uninitialized variable '" + currentToken.value + "'";
+									statement.message = "Variable '" + currentToken.value + "' is not initialized";
 									errors.push_back({statement.line, statement.message});
 								}
 							}
@@ -1542,8 +1556,8 @@ void analyze(vector<Statement> *statements)
 					if (symbol_table.count(var.name) == 0)
 					{
 						statement.validity = false;
-						cout << "Line " << statement.line << " : identifier/variable '" << var.name << "' not declared" << endl;
-						statement.message = "Undeclared variable '" + var.name + "'";
+						cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not declared" << endl;
+						statement.message = "Identifier/variable '" + currentToken.value + "' is not declared";
 						errors.push_back({statement.line, statement.message});
 						break;
 					}
@@ -1553,7 +1567,7 @@ void analyze(vector<Statement> *statements)
 						if (!variable.initialized)
 						{
 							cout << "Line " << statement.line << " : variable '" << currentToken.value << "' not initialized" << endl;
-							statement.message = "Uninitialized variable '" + currentToken.value + "'";
+							statement.message = "Variable '" + currentToken.value + "'";
 							errors.push_back({statement.line, statement.message});
 						}
 					}
@@ -1568,8 +1582,6 @@ void analyze(vector<Statement> *statements)
 		std::cout << pair.first << ", data type id: " << pair.second.type << " (initialized: " << pair.second.initialized << ")" << std::endl;
 	}
 }
-
-
 
 void printErrors(vector<Error> errors)
 {

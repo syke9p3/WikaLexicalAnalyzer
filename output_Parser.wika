@@ -1,9 +1,17 @@
 
 LINE			INDEX			TOKENS				MESSAGE			
-1	int y ; Valid			
-2	int y ; Valid			
-3	int a ; Valid			
-4	string x = " hello " ; Valid			
-5	int c = 4 ; Valid			
-7	y = 5 + a + y ; Valid			
-8	z = 5 ; Valid			
+2	int x = 9 + " Hello " ; Valid			
+3	int x = 30 + 1.5 ; Valid			
+4	int x = 30 ; Valid			
+5	y = x + 4 ; Valid			
+7	int Invalid			Expected expression but got keyword 'habang'
+7	Invalid			Unexpected token  '+'
+7	Invalid			Unexpected token constant '1'
+7	Valid			
+8	int b ; Valid			
+9	b = x + 8 ; Valid			
+11	int repeat ; Valid			
+12	float repeat ; Valid			
+14	string name = " hello " ; Valid			
+15	int age = 1 + year , ; Valid			
+16	year = age ; Valid			
