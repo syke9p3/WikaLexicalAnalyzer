@@ -1352,6 +1352,30 @@ struct Variable
 
 unordered_map<string, Variable> symbol_table;
 
+string checkDataType(Token token)
+{
+	string dataType;
+
+	if (token.description == "Integer Constant Value")
+	{
+		dataType = "int";
+	}
+	else if (token.description == "String Constant Value")
+	{
+		dataType = "string";
+	}
+	else if (token.description == "Float Constant Value")
+	{
+		dataType = "float";
+	}
+	else if (token.description == "Boolean Constant Value")
+	{
+		dataType = "bool";
+	}
+
+	return dataType;
+}
+
 void analyze(vector<Statement> *statements)
 {
 	for (Statement statement : *statements)
@@ -1366,7 +1390,7 @@ void analyze(vector<Statement> *statements)
 			var.initialized;
 			var.value;
 
-			for (int i = 0; i < statement.tokens.size(); i++) // Read each tokens of each statement
+			for (int i = 0; i < statement.tokens.size(); i++) // Read each tokens of the current statement
 			{
 				Token currentToken = (statement.tokens)[i];
 
@@ -1393,17 +1417,46 @@ void analyze(vector<Statement> *statements)
 				{
 					var.name = currentToken.value;
 
-					if (statement.tokens[i + 1].type == ASSIGN_OP) // identifier is before assign_op
+					if (statement.tokens[i + 1].type == ASSIGN_OP) // identifier comes before assignment operator ('=')
 					{
 						var.initialized = true;
+
+						// CHECK DATA TYPE OF TOKENS between '=' and ',' or ';'
+						int j = i + 2; // select token after ASSIGN_OP
+						currentToken = (statement.tokens)[j];
+						while (currentToken.value != "," && currentToken.value != ";")
+						{
+							// check if token is identifier or constant
+							if (currentToken.type == CONSTANT) 
+							{ 
+								string dataType = checkDataType((statement.tokens)[j]);
+
+								if ((var.type == "int" && dataType == "int") ||
+									(var.type == "float" && dataType == "float") ||
+									(var.type == "string" && dataType == "string") ||
+									(var.type == "bool" && dataType == "bool"))
+								{
+								}
+								else
+								{
+									cout << "Line " << statement.line << " : Invalid conversion from '" << dataType << "' to '" << var.type << endl;
+								}
+							}
+							else if (currentToken.type == IDENTIFIER) // it's a variable so we check its data type instead
+							{
+								
+							}
+
+							j++;
+							currentToken = (statement.tokens)[j];
+						}
 					}
 					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ";") || // between data type and ; )(int x;)
-							 (statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ",") || // between data type and ; )(int x;)
+							 (statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ",") || // between data type and , )(int x,)
 							 (statement.tokens[i - 1].value == "," && statement.tokens[i + 1].value == ",") ||		// between commas , ,)(,x,)
 							 (statement.tokens[i - 1].value == "," && statement.tokens[i + 1].value == ";"))		// between , and ;)(,z;)
 
 					{
-
 						var.initialized = false;
 					}
 					else
@@ -1432,7 +1485,6 @@ void analyze(vector<Statement> *statements)
 							j++;
 							currentToken = (statement.tokens)[j];
 						}
-						// i = j;
 						continue;
 					}
 
