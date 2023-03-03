@@ -3,11 +3,6 @@
 
 	Language: C++
 
-	To compile, type in Powershell:
-	```
-		g++ parse.c
-		./a.exe
-	```
 Group 4
 Members:
 	Agulto, Marilyn
@@ -28,10 +23,11 @@ Members:
 
 using namespace std;
 
-string fileName = "clarence.wika";
+string fileName = "a_test.wika";
 string outputFileLexer = "output_Lexer.wika";
 string outputFileParser = "output_Parser.wika";
 string outputFileSemantic = "output_Semantic.wika";
+string outputFileInterpreter = "output_Interpreter.wika";
 
 /*============================= LEXER ========================================================================*/
 
@@ -1382,8 +1378,7 @@ struct Variable
 map<string, Variable> symbol_table;
 vector<Variable> declaredVariables;
 
-map<string, Variable> solveVariables(map<string, Variable> symbol_table); 
-
+map<string, Variable> solveVariables(map<string, Variable> symbol_table);
 
 string checkDataType(Token token)
 {
@@ -1408,7 +1403,6 @@ string checkDataType(Token token)
 
 	return dataType;
 }
-
 
 void analyze(vector<Statement> *statements)
 {
@@ -1634,7 +1628,6 @@ void analyze(vector<Statement> *statements)
 		}
 
 		symbol_table = solveVariables(symbol_table);
-
 	}
 
 	cout << "\n\n"
@@ -1652,13 +1645,9 @@ int solveExpression(vector<Token> expression)
 	int i = 0;
 	int n = expression.size();
 
-			cout << "debug seembol table x = " << symbol_table["x"].value << endl;
-	
-
 	// Handle the case where the expression is just a single constant or identifier
 	if (n == 1)
 	{
-		
 
 		Token token = expression[0];
 		if (token.type == CONSTANT)
@@ -1669,14 +1658,12 @@ int solveExpression(vector<Token> expression)
 		{
 			// cout << "debug seembol table x = " << symbol_table["x"].value << endl;
 
-
 			int varValue;
 			// Look up the value of the identifier in the symbol table
 			// cout << "debug solveExp -- of " << token.value << " = " << symbol_table[token.value].value << endl;
 			return symbol_table[token.value].value;
 		}
 	}
-	
 
 	// Evaluate the expression using a simple left-to-right approach
 	while (i < n)
@@ -1757,7 +1744,6 @@ map<string, Variable> solveVariables(map<string, Variable> symbol_table) // upda
 
 void printErrors(vector<Error> errors)
 {
-
 	sort(errors.begin(), errors.end(), [](const Error &e1, const Error &e2)
 		 { return e1.line < e2.line; });
 
@@ -1796,9 +1782,8 @@ struct interpret
 void interOut(vector<Statement> *statements)
 {
 	int i = 0;
-	printf(":---------------------OUTPUT------------------------------:\n\n");
-	// int accumulator = 0;
-	// string output = "";
+	printf(":-------------------------------OUTPUT----------------------------------:\n\n");
+	vector<string> outputAccumulator;
 	interpret interpreter[100];
 	int a = 0;
 	for (Statement statement : *statements)
@@ -1872,6 +1857,7 @@ void interOut(vector<Statement> *statements)
 		{
 
 			vector<Token> outputExpression;
+			int outValue;
 			for (i = 0; i < statement.tokens.size(); i++)
 			{
 				int j;
@@ -1898,40 +1884,25 @@ void interOut(vector<Statement> *statements)
 				}
 			}
 
-			for (int i = 0; i < outputExpression.size(); i++)
-			{
-				cout << outputExpression[i].value << " " << endl;
-			}
-
-			int outValue = solveExpression(outputExpression);
-
-			cout << outValue << endl;
-
-			// for (int i = 0; i < outputExpression.size(); i++)
-			// {
-			// 	if (outputExpression[i].description == "String Constant Value")
-			// 	{
-			// 	}
-			// 	else if (outputExpression[i].description == "Integer Constant Value")
-			// 	{
-			// 		solveExpression(outputExpression);
-			// 	}
-			// }
-
-			// for (Token token : outputAccumulator)
-			// { // print
-			// string dataType = checkDataType((statement.tokens)[j]);
-
-			// Variable var;
-			// var.value;
-			// var.type;
-			// var = symbol_table[currentToken.value];
-			// 	cout << token.value << endl;
-			// }
-
-			// tignan( x + "hello" + 1 ) :: == EXPRESSION :: = (STRING | IDENTIFIER | CONSTANT)
+			outValue = solveExpression(outputExpression);
+			cout << to_string(outValue) << endl;
+			outputAccumulator.push_back(to_string(outValue));
 		}
 	}
+
+	ofstream file(outputFileInterpreter);
+
+	if (file.is_open())
+	{
+		cout << " debug size  " << outputAccumulator.size() << endl;
+		for (int j = 0; j < outputAccumulator.size(); j++)
+		{	
+			cout << " debug reach " << outputAccumulator[j] << endl;
+			file << outputAccumulator[j] << endl;
+		}
+	}
+
+	file.close();
 }
 
 int main()

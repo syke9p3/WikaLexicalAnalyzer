@@ -4,97 +4,86 @@ LINE			INDEX			TOKEN				TYPE			DESCRIPTION
 1			1			x				IDENTIFIER		Identifier x
 1			2			=				ASSIGN_OP			Assignment Operator
 1			3			21				CONSTANT		Integer Constant Value
-1			4			,				DELIMITER				Comma
-1			5			s				IDENTIFIER		Identifier s
-1			6			=				ASSIGN_OP			Assignment Operator
-1			7			1				CONSTANT		Integer Constant Value
-1			8			;				SEMICOLON				Semicolon
-1			9			
+1			4			;				SEMICOLON				Semicolon
+1			5			
 				New Line Character
-2			10			int				dataType			Integer Data Type
-2			11			z				IDENTIFIER		Identifier z
-2			12			=				ASSIGN_OP			Assignment Operator
-2			13			x				IDENTIFIER		Identifier x
-2			14			+				ARITH_OP				Addition Symbol
-2			15			7				CONSTANT		Integer Constant Value
-2			16			;				SEMICOLON				Semicolon
-2			17			
+2			6			int				dataType			Integer Data Type
+2			7			z				IDENTIFIER		Identifier z
+2			8			=				ASSIGN_OP			Assignment Operator
+2			9			x				IDENTIFIER		Identifier x
+2			10			+				ARITH_OP				Addition Symbol
+2			11			7				CONSTANT		Integer Constant Value
+2			12			;				SEMICOLON				Semicolon
+2			13			
 				New Line Character
-3			18			int				dataType			Integer Data Type
-3			19			za				IDENTIFIER		Identifier za
-3			20			=				ASSIGN_OP			Assignment Operator
-3			21			x				IDENTIFIER		Identifier x
-3			22			-				ARITH_OP				Subraction Symbol, line
-3			23			7				CONSTANT		Integer Constant Value
-3			24			;				SEMICOLON				Semicolon
-3			25			
+3			14			int				dataType			Integer Data Type
+3			15			za				IDENTIFIER		Identifier za
+3			16			=				ASSIGN_OP			Assignment Operator
+3			17			x				IDENTIFIER		Identifier x
+3			18			-				ARITH_OP				Subraction Symbol, line
+3			19			7				CONSTANT		Integer Constant Value
+3			20			;				SEMICOLON				Semicolon
+3			21			
 				New Line Character
-4			26			int				dataType			Integer Data Type
-4			27			zb				IDENTIFIER		Identifier zb
-4			28			=				ASSIGN_OP			Assignment Operator
-4			29			x				IDENTIFIER		Identifier x
-4			30			*				ARITH_OP				Multiplication Symbol, line
-4			31			7				CONSTANT		Integer Constant Value
-4			32			;				SEMICOLON				Semicolon
-4			33			
+4			22			int				dataType			Integer Data Type
+4			23			zb				IDENTIFIER		Identifier zb
+4			24			=				ASSIGN_OP			Assignment Operator
+4			25			x				IDENTIFIER		Identifier x
+4			26			*				ARITH_OP				Multiplication Symbol, line
+4			27			7				CONSTANT		Integer Constant Value
+4			28			;				SEMICOLON				Semicolon
+4			29			
 				New Line Character
-5			34			int				dataType			Integer Data Type
-5			35			zc				IDENTIFIER		Identifier zc
-5			36			=				ASSIGN_OP			Assignment Operator
-5			37			x				IDENTIFIER		Identifier x
-5			38			/				ARITH_OP				Division Symbol
-5			39			7				CONSTANT		Integer Constant Value
-5			40			;				SEMICOLON				Semicolon
-5			41			
+5			30			int				dataType			Integer Data Type
+5			31			zc				IDENTIFIER		Identifier zc
+5			32			=				ASSIGN_OP			Assignment Operator
+5			33			x				IDENTIFIER		Identifier x
+5			34			-				ARITH_OP				Subraction Symbol, line
+5			35			2				CONSTANT		Integer Constant Value
+5			36			;				SEMICOLON				Semicolon
+5			37			
 				New Line Character
-6			42			/*				COMMENT				Multi Line Comment Start
-6			43			comment				COMMENT				Multi line comment
-6			44			*/				COMMENT				Multi Line Comment End
-6			45			
+6			38			/*				COMMENT				Multi Line Comment Start
+6			39			comment				COMMENT				Multi line comment
+6			40			*/				COMMENT				Multi Line Comment End
+6			41			
 				New Line Character
-7			46			tignan				KEYWORD			Output Statement
-7			47			(				DELIMITER				Left Parenthesis
-7			48			s				IDENTIFIER		Identifier s
-7			49			)				DELIMITER				Right Parenthesis
-7			50			;				SEMICOLON				Semicolon
-7			51			
+7			42			tignan				KEYWORD			Output Statement
+7			43			(				DELIMITER				Left Parenthesis
+7			44			s				IDENTIFIER		Identifier s
+7			45			)				DELIMITER				Right Parenthesis
+7			46			;				SEMICOLON				Semicolon
+7			47			
 				New Line Character
-8			52			tignan				KEYWORD			Output Statement
-8			53			(				DELIMITER				Left Parenthesis
-8			54			z				IDENTIFIER		Identifier z
-8			55			)				DELIMITER				Right Parenthesis
-8			56			;				SEMICOLON				Semicolon
-8			57			
+8			48			tignan				KEYWORD			Output Statement
+8			49			(				DELIMITER				Left Parenthesis
+8			50			z				IDENTIFIER		Identifier z
+8			51			)				DELIMITER				Right Parenthesis
+8			52			;				SEMICOLON				Semicolon
+8			53			
 				New Line Character
-9			58			tignan				KEYWORD			Output Statement
-9			59			(				DELIMITER				Left Parenthesis
-9			60			za				IDENTIFIER		Identifier za
-9			61			)				DELIMITER				Right Parenthesis
-9			62			;				SEMICOLON				Semicolon
-9			63			
+9			54			tignan				KEYWORD			Output Statement
+9			55			(				DELIMITER				Left Parenthesis
+9			56			za				IDENTIFIER		Identifier za
+9			57			)				DELIMITER				Right Parenthesis
+9			58			;				SEMICOLON				Semicolon
+9			59			
 				New Line Character
-10			64			tignan				KEYWORD			Output Statement
-10			65			(				DELIMITER				Left Parenthesis
-10			66			zb				IDENTIFIER		Identifier zb
-10			67			)				DELIMITER				Right Parenthesis
-10			68			;				SEMICOLON				Semicolon
-10			69			
+10			60			tignan				KEYWORD			Output Statement
+10			61			(				DELIMITER				Left Parenthesis
+10			62			zb				IDENTIFIER		Identifier zb
+10			63			)				DELIMITER				Right Parenthesis
+10			64			;				SEMICOLON				Semicolon
+10			65			
 				New Line Character
-11			70			tignan				KEYWORD			Output Statement
-11			71			(				DELIMITER				Left Parenthesis
-11			72			zc				IDENTIFIER		Identifier zc
-11			73			)				DELIMITER				Right Parenthesis
-11			74			;				SEMICOLON				Semicolon
-11			75			
+11			66			tignan				KEYWORD			Output Statement
+11			67			(				DELIMITER				Left Parenthesis
+11			68			zc				IDENTIFIER		Identifier zc
+11			69			)				DELIMITER				Right Parenthesis
+11			70			;				SEMICOLON				Semicolon
+11			71			
 				New Line Character
-12			76			tignan				KEYWORD			Output Statement
-12			77			(				DELIMITER				Left Parenthesis
-12			78			z				IDENTIFIER		Identifier z
-12			79			+				ARITH_OP				Addition Symbol
-12			80			za				IDENTIFIER		Identifier za
-12			81			)				DELIMITER				Right Parenthesis
-12			82			;				SEMICOLON				Semicolon
-12			83			
+12			72			
 				New Line Character
-13			84			
+13			73			
 				New Line Character
