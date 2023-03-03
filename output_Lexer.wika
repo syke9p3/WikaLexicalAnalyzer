@@ -50,40 +50,42 @@ LINE			INDEX			TOKEN				TYPE			DESCRIPTION
 				New Line Character
 7			42			tignan				KEYWORD			Output Statement
 7			43			(				DELIMITER				Left Parenthesis
-7			44			s				IDENTIFIER		Identifier s
-7			45			)				DELIMITER				Right Parenthesis
-7			46			;				SEMICOLON				Semicolon
-7			47			
+7			44			"				DELIMITER				Delimiter Double Quotation
+7			45			Results: 				CONSTANT		String Constant Value
+7			46			"				DELIMITER				Delimiter Double Quotation
+7			47			)				DELIMITER				Right Parenthesis
+7			48			;				SEMICOLON				Semicolon
+7			49			
 				New Line Character
-8			48			tignan				KEYWORD			Output Statement
-8			49			(				DELIMITER				Left Parenthesis
-8			50			z				IDENTIFIER		Identifier z
-8			51			)				DELIMITER				Right Parenthesis
-8			52			;				SEMICOLON				Semicolon
-8			53			
+8			50			tignan				KEYWORD			Output Statement
+8			51			(				DELIMITER				Left Parenthesis
+8			52			z				IDENTIFIER		Identifier z
+8			53			)				DELIMITER				Right Parenthesis
+8			54			;				SEMICOLON				Semicolon
+8			55			
 				New Line Character
-9			54			tignan				KEYWORD			Output Statement
-9			55			(				DELIMITER				Left Parenthesis
-9			56			za				IDENTIFIER		Identifier za
-9			57			)				DELIMITER				Right Parenthesis
-9			58			;				SEMICOLON				Semicolon
-9			59			
+9			56			tignan				KEYWORD			Output Statement
+9			57			(				DELIMITER				Left Parenthesis
+9			58			za				IDENTIFIER		Identifier za
+9			59			)				DELIMITER				Right Parenthesis
+9			60			;				SEMICOLON				Semicolon
+9			61			
 				New Line Character
-10			60			tignan				KEYWORD			Output Statement
-10			61			(				DELIMITER				Left Parenthesis
-10			62			zb				IDENTIFIER		Identifier zb
-10			63			)				DELIMITER				Right Parenthesis
-10			64			;				SEMICOLON				Semicolon
-10			65			
+10			62			tignan				KEYWORD			Output Statement
+10			63			(				DELIMITER				Left Parenthesis
+10			64			zb				IDENTIFIER		Identifier zb
+10			65			)				DELIMITER				Right Parenthesis
+10			66			;				SEMICOLON				Semicolon
+10			67			
 				New Line Character
-11			66			tignan				KEYWORD			Output Statement
-11			67			(				DELIMITER				Left Parenthesis
-11			68			zc				IDENTIFIER		Identifier zc
-11			69			)				DELIMITER				Right Parenthesis
-11			70			;				SEMICOLON				Semicolon
-11			71			
+11			68			tignan				KEYWORD			Output Statement
+11			69			(				DELIMITER				Left Parenthesis
+11			70			zc				IDENTIFIER		Identifier zc
+11			71			)				DELIMITER				Right Parenthesis
+11			72			;				SEMICOLON				Semicolon
+11			73			
 				New Line Character
-12			72			
+12			74			
 				New Line Character
-13			73			
+13			75			
 				New Line Character

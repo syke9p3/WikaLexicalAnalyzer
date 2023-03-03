@@ -1857,7 +1857,9 @@ void interOut(vector<Statement> *statements)
 		{
 
 			vector<Token> outputExpression;
+			vector<Token> outputString;
 			int outValue;
+
 			for (i = 0; i < statement.tokens.size(); i++)
 			{
 				int j;
@@ -1869,16 +1871,20 @@ void interOut(vector<Statement> *statements)
 					while (statement.tokens[j].value != ")")
 					{
 
-						if (statement.tokens[j].value == "\"")
+						if (statement.tokens[j+1].description == "String Constant Value")
 						{
-							// outputExpression.push_back(statement.tokens[j + 2]);
+							cout << "debug string == " << statement.tokens[j+1].value << endl;
+							outputAccumulator.push_back(statement.tokens[j+1].value);
 							j += 3;
+							
 						}
 						else
 						{
 							outputExpression.push_back(statement.tokens[j]);
+							j++;
 						}
-						j++;
+
+						
 					}
 					i = j;
 				}
@@ -1894,10 +1900,9 @@ void interOut(vector<Statement> *statements)
 
 	if (file.is_open())
 	{
-		cout << " debug size  " << outputAccumulator.size() << endl;
 		for (int j = 0; j < outputAccumulator.size(); j++)
 		{	
-			cout << " debug reach " << outputAccumulator[j] << endl;
+			// cout << " debug reach " << outputAccumulator[j] << endl;
 			file << outputAccumulator[j] << endl;
 		}
 	}

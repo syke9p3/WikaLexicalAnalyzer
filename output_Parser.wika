@@ -8,7 +8,7 @@ LINE			INDEX			TOKENS				MESSAGE
 6	Valid			
 6	Valid			
 6	Valid			
-7	tignan ( s ) ; Valid			
+7	tignan ( " Results:  " ) ; Valid			
 8	tignan ( z ) ; Valid			
 9	tignan ( za ) ; Valid			
 10	tignan ( zb ) ; Valid			
