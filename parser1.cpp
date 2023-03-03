@@ -875,6 +875,7 @@ Statement parseOutput(vector<Token> *tokens, int *i)
 	}
 
 	*i = j;
+	output.type = "OUTPUT";
 	return output;
 }
 
@@ -1378,7 +1379,7 @@ struct Variable
 	int value;
 };
 
-unordered_map<string, Variable> symbol_table;
+map<string, Variable> symbol_table;
 
 string checkDataType(Token token)
 {
@@ -1404,11 +1405,12 @@ string checkDataType(Token token)
 	return dataType;
 }
 
+vector<Variable> declaredVariables;
+
 void analyze(vector<Statement> *statements)
 {
 	for (Statement statement : *statements)
 	{
-		vector<Variable> declaredVariables;
 
 		if (statement.type == "DECLARATION")
 		{
@@ -1417,6 +1419,8 @@ void analyze(vector<Statement> *statements)
 			var.name;
 			var.initialized;
 			var.value;
+
+			// int x = 1+1, y = a ;
 
 			for (int i = 0; i < statement.tokens.size(); i++) // Read each tokens of the current statement
 			{
@@ -1452,7 +1456,7 @@ void analyze(vector<Statement> *statements)
 						// CHECK DATA TYPE OF TOKENS between '=' and ',' or ';'
 						int j = i + 2; // select token after ASSIGN_OP
 						currentToken = (statement.tokens)[j];
-						while (currentToken.value != "," && currentToken.value != ";")
+						while (currentToken.value != "," && currentToken.value != ";") // in between = and , or ;
 						{
 							var.expression.push_back(currentToken);
 							// check if token is identifier or constant
@@ -1476,10 +1480,25 @@ void analyze(vector<Statement> *statements)
 							}
 							else if (currentToken.type == IDENTIFIER) // it's a variable so we check its data type instead
 							{
+
+								// if ((var.type == "int" && dataType == "int") ||
+								// 	(var.type == "float" && dataType == "float") ||
+								// 	(var.type == "string" && dataType == "string") ||
+								// 	(var.type == "bool" && dataType == "bool"))
+								// {
+
+								// }else
+								// {
+								// 	cout << "Line " << statement.line << " : Invalid conversion from '" << dataType << "' to '" << var.type << endl;
+								// 	statement.message = "Invalid conversion from '" + dataType + "' to '" + var.type + "'";
+								// 	errors.push_back({statement.line, statement.message});
+								// 	break;
+								// }
 							}
 
 							j++;
 							currentToken = (statement.tokens)[j];
+							i = j;
 						}
 					}
 					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ";") || // between data type and ; )(int x;)
@@ -1488,14 +1507,17 @@ void analyze(vector<Statement> *statements)
 							 (statement.tokens[i - 1].value == "," && statement.tokens[i + 1].value == ";"))		// between , and ;)(,z;)
 
 					{
+
+						// int x, y, z;
 						var.initialized = false;
 					}
-					else
+					else // if iden is RHS
 					{
 
 						int j = i;
 						currentToken = (statement.tokens)[j];
 						while (currentToken.value != "," && currentToken.value != ";")
+
 						{
 							if (currentToken.value == var.name && symbol_table.count(var.name) == 0)
 							{
@@ -1608,16 +1630,18 @@ void analyze(vector<Statement> *statements)
 			}
 		}
 	}
+
 	cout << "\n\n"
 		 << "VARIABLE SYMBOL TABLE CONTENTS: " << endl;
 	for (auto &pair : symbol_table)
 	{
-		std::cout << pair.first << ", data type id: " << pair.second.type << " (initialized: " << pair.second.initialized << ")" << std::endl;
+		cout << pair.first << ", data type id: " << pair.second.type << " (initialized: " << pair.second.initialized << ")" << std::endl;
 	}
 }
 
 int solveExpression(vector<Token> expression)
 {
+
 	int accumulator = 0;
 	int i = 0;
 	int n = expression.size();
@@ -1632,8 +1656,10 @@ int solveExpression(vector<Token> expression)
 		}
 		else
 		{
+			int varValue;
 			// Look up the value of the identifier in the symbol table
-			// return symbol_table[token.value];
+			cout << "debug solveExp of " << symbol_table[token.value].name << " = " << symbol_table[token.value].value << endl;
+			return symbol_table[token.value].value;
 		}
 	}
 
@@ -1646,8 +1672,6 @@ int solveExpression(vector<Token> expression)
 		i += 3;
 
 		int leftValue, rightValue;
-
-
 
 		// Handle the left operand
 		if (left.type == CONSTANT)
@@ -1693,6 +1717,27 @@ int solveExpression(vector<Token> expression)
 	return accumulator;
 }
 
+void solveVariables(map<string, Variable> symbol_table)
+{
+
+	Variable var;
+	var.expression;
+	var.value;
+	var.type;
+
+	for (int i = 0; i < symbol_table.size(); i++) // loop over all variables in symbol table
+	{
+		var = symbol_table[declaredVariables[i].name];
+		if (var.type == "int")
+		{
+			var.value = solveExpression(var.expression);
+			symbol_table[declaredVariables[i].name].value = var.value;
+			cout << "debug value of " << var.name << " = " << var.value << endl;
+			cout << "debug value of " << declaredVariables[i].name << " = " << symbol_table[declaredVariables[i].name].value << endl;
+		}
+	}
+}
+
 void printErrors(vector<Error> errors)
 {
 
@@ -1712,7 +1757,7 @@ void printErrors(vector<Error> errors)
 
 		file << "\n\n"
 			 << "ERRORS" << endl;
-		for (int i=0; i < errors.size();i++  )
+		for (int i = 0; i < errors.size(); i++)
 		{
 			file << "Line " << errors[i].line << " :\t" << errors[i].message << endl;
 		}
@@ -1736,8 +1781,8 @@ void interOut(vector<Statement> *statements)
 	int i = 0;
 	printf("interpreter Output\n");
 	printf("Interpret\n");
-	int accumulator = 0;
-	string output = "";
+	// int accumulator = 0;
+	// string output = "";
 	interpret interpreter[100];
 	int a = 0;
 	for (Statement statement : *statements)
@@ -1799,7 +1844,7 @@ void interOut(vector<Statement> *statements)
 				Token currentToken = (statement.tokens)[i];
 				if (currentToken.type == IDENTIFIER)
 				{
-					cout << "\nident in ass\n";
+					cout << "\nident in assign\n";
 				}
 				else
 				{
@@ -1807,16 +1852,62 @@ void interOut(vector<Statement> *statements)
 				}
 			}
 		}
-		else
+		else if (statement.type == "OUTPUT")
 		{
+
+			vector<Token> outputExpression;
 			for (i = 0; i < statement.tokens.size(); i++)
 			{
+				int j;
+
 				Token currentToken = (statement.tokens)[i];
-				if (currentToken.value == "tignan")
+				if (currentToken.value == "tignan") // tignan(x + y) // assume all var are int
 				{
-					printf("\ntignan\n");
+					j = i + 2;
+					while (statement.tokens[j].value != ")")
+					{
+
+						if (statement.tokens[j].value == "\"")
+						{
+							// outputExpression.push_back(statement.tokens[j + 2]);
+							j += 3;
+						}
+						else
+						{
+							outputExpression.push_back(statement.tokens[j]);
+						}
+						j++;
+					}
+					i = j;
 				}
 			}
+			cout << "debug outInt " << endl;
+			int outInt = solveExpression(outputExpression);
+			cout << "debug outInt " << outInt << endl;
+
+			// for (int i = 0; i < outputExpression.size(); i++)
+			// {
+			// 	if (outputExpression[i].description == "String Constant Value")
+			// 	{
+			// 	}
+			// 	else if (outputExpression[i].description == "Integer Constant Value")
+			// 	{
+			// 		solveExpression(outputExpression);
+			// 	}
+			// }
+
+			// for (Token token : outputAccumulator)
+			// { // print
+			// string dataType = checkDataType((statement.tokens)[j]);
+
+			// Variable var;
+			// var.value;
+			// var.type;
+			// var = symbol_table[currentToken.value];
+			// 	cout << token.value << endl;
+			// }
+
+			// tignan( x + "hello" + 1 ) :: == EXPRESSION :: = (STRING | IDENTIFIER | CONSTANT)
 		}
 	}
 }
@@ -1856,10 +1947,12 @@ int main()
 			vector<Statement> statements = parse(&tokens);
 			testStatementTokens(statements);
 			analyze(&statements);
-			printErrors(errors);
 
+			printErrors(errors);
+			solveVariables(symbol_table);
 			interOut(&statements);
 
+			cout << "debug ananna " << endl;
 		}
 		else
 		{

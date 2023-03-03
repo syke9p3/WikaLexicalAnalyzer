@@ -1,1 +1,5 @@
-int x = 1 - 1 + 3;
+int x = 1 + 7; 
+int y = 2; 
+int z = 4 + 7;
+
+tignan(x);
