@@ -1,7 +1,6 @@
-int z = 1 + 2;
-int x = 2;
-/*comment*/
-tignan(z);
+int x, y = 1 + 2 - 3 / 4, z = "hello" + 7;
+c = 4;
 string greetings = "hello" + 1;
+int x = 1;
 int y = 2 + 3 + 5;
 c = a + b;
