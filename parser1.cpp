@@ -1380,6 +1380,7 @@ struct Variable
 };
 
 map<string, Variable> symbol_table;
+vector<Variable> declaredVariables;
 
 string checkDataType(Token token)
 {
@@ -1404,8 +1405,6 @@ string checkDataType(Token token)
 
 	return dataType;
 }
-
-vector<Variable> declaredVariables;
 
 void analyze(vector<Statement> *statements)
 {
@@ -1658,7 +1657,7 @@ int solveExpression(vector<Token> expression)
 		{
 			int varValue;
 			// Look up the value of the identifier in the symbol table
-			cout << "debug solveExp of " << symbol_table[token.value].name << " = " << symbol_table[token.value].value << endl;
+			// cout << "debug solveExp -- of " << token.value << " = " << symbol_table[token.value].value << endl;
 			return symbol_table[token.value].value;
 		}
 	}
@@ -1681,7 +1680,8 @@ int solveExpression(vector<Token> expression)
 		else
 		{
 			// Look up the value of the identifier in the symbol table
-			// leftValue = symbol_table[left.value];
+			cout << "debug seembol table x = " << symbol_table["x"].value << endl;
+			leftValue = symbol_table[left.value].value;
 		}
 
 		// Handle the right operand
@@ -1692,7 +1692,7 @@ int solveExpression(vector<Token> expression)
 		else
 		{
 			// Look up the value of the identifier in the symbol table
-			// rightValue = symbol_table[right.value];
+			rightValue = symbol_table[right.value].value;
 		}
 
 		// Apply the operator
@@ -1717,7 +1717,7 @@ int solveExpression(vector<Token> expression)
 	return accumulator;
 }
 
-void solveVariables(map<string, Variable> symbol_table)
+map<string, Variable> solveVariables(map<string, Variable> symbol_table)
 {
 
 	Variable var;
@@ -1731,11 +1731,13 @@ void solveVariables(map<string, Variable> symbol_table)
 		if (var.type == "int")
 		{
 			var.value = solveExpression(var.expression);
+
 			symbol_table[declaredVariables[i].name].value = var.value;
-			cout << "debug value of " << var.name << " = " << var.value << endl;
 			cout << "debug value of " << declaredVariables[i].name << " = " << symbol_table[declaredVariables[i].name].value << endl;
 		}
 	}
+
+	return symbol_table;
 }
 
 void printErrors(vector<Error> errors)
@@ -1779,8 +1781,7 @@ struct interpret
 void interOut(vector<Statement> *statements)
 {
 	int i = 0;
-	printf("interpreter Output\n");
-	printf("Interpret\n");
+	printf(":---------------------OUTPUT------------------------------:\n\n");
 	// int accumulator = 0;
 	// string output = "";
 	interpret interpreter[100];
@@ -1794,18 +1795,18 @@ void interOut(vector<Statement> *statements)
 				Token currentToken = (statement.tokens)[i];
 				if (currentToken.type == DATA_TYPE)
 				{
-					cout << "\nData type|";
+					// cout << "\nData type|";
 					i++;
 					Token currentToken = (statement.tokens)[i];
 					if (currentToken.type == IDENTIFIER)
 					{
-						cout << "Ident in dec|";
+						// cout << "Ident in dec|";
 						interpreter[a].varname = currentToken.value;
 						i++;
 						Token currentToken = (statement.tokens)[i];
 						if (currentToken.value == "=")
 						{
-							cout << "=|";
+							// cout << "=|";
 							i++;
 							Token currentToken = (statement.tokens)[i];
 							for (int j = i; j < statement.tokens.size(); j++)
@@ -1814,8 +1815,8 @@ void interOut(vector<Statement> *statements)
 								if (currentToken.value == ";")
 								{
 
-									cout << interpreter[a].solve;
-									cout << " here exit ";
+									// cout << interpreter[a].solve;
+									// cout << " here exit ";
 									a++;
 									break;
 								}
@@ -1875,15 +1876,14 @@ void interOut(vector<Statement> *statements)
 						else
 						{
 							outputExpression.push_back(statement.tokens[j]);
+							int outValue = solveExpression(outputExpression);
+							cout << outValue << endl;
 						}
 						j++;
 					}
 					i = j;
 				}
 			}
-			cout << "debug outInt " << endl;
-			int outInt = solveExpression(outputExpression);
-			cout << "debug outInt " << outInt << endl;
 
 			// for (int i = 0; i < outputExpression.size(); i++)
 			// {
@@ -1949,10 +1949,9 @@ int main()
 			analyze(&statements);
 
 			printErrors(errors);
-			solveVariables(symbol_table);
-			interOut(&statements);
 
-			cout << "debug ananna " << endl;
+			symbol_table = solveVariables(symbol_table);
+			interOut(&statements);
 		}
 		else
 		{

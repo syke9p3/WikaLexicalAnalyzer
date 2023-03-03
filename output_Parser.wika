@@ -1,11 +1,8 @@
 
 LINE			INDEX			TOKENS				MESSAGE			
-1	int z = 1 + 2 ; Valid			
-2	int x = 2 ; Valid			
+1	int x = 3 ; Valid			
+2	int z = x + 7 ; Valid			
 3	Valid			
 3	Valid			
 3	Valid			
 4	tignan ( z ) ; Valid			
-5	string greetings = " hello " + 1 ; Valid			
-6	int y = 2 + 3 + 5 ; Valid			
-7	c = a + b ; Valid			
