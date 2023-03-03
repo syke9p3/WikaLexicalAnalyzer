@@ -1,12 +1,1 @@
-int x = 9 + "Hello";
-int x = 30 + 1.5;
-int x = 30;
-y = x + 4;
-int keyword = habang + 1; 
-int b;
-b = x + 8;
-int repeat;
-float repeat;
-string name = "hello"; 
-int age = 1 + year, a;
-year = age;
+int x = 1 - 1 + 3;

@@ -1,8 +1,6 @@
 /*
 	# Lexical and Syntax Analyzer for Wika Programming Language
-
 	Language: C++
-
 	To compile, type in Powershell:
 	```
 		g++ parse.c
@@ -15,7 +13,6 @@ Members:
 	Enriquez, Kyle Sebastien
 	Prado, Clarence
 	Saya-ang, Kenth G.
-
 */
 
 #include <iostream>
@@ -31,7 +28,6 @@ using namespace std;
 string fileName = "clarence.wika";
 string outputFileLexer = "output_Lexer.wika";
 string outputFileParser = "output_Parser.wika";
-string outputFileSemantic = "output_Semantic.wika";
 
 /*============================= LEXER ========================================================================*/
 
@@ -1376,6 +1372,7 @@ struct Variable
 	bool initialized = false;
 	vector<Token> expression;
 	int value;
+	int values;
 };
 
 unordered_map<string, Variable> symbol_table;
@@ -1445,7 +1442,7 @@ void analyze(vector<Statement> *statements)
 				{
 					var.name = currentToken.value;
 
-					if (statement.tokens[i + 1].type == ASSIGN_OP) // identifier comes before assignment operator ('=') which mean LHS variable
+					if (statement.tokens[i + 1].type == ASSIGN_OP) // identifier comes before assignment operator ('=')
 					{
 						var.initialized = true;
 
@@ -1454,7 +1451,6 @@ void analyze(vector<Statement> *statements)
 						currentToken = (statement.tokens)[j];
 						while (currentToken.value != "," && currentToken.value != ";")
 						{
-							var.expression.push_back(currentToken);
 							// check if token is identifier or constant
 							if (currentToken.type == CONSTANT)
 							{
@@ -1531,13 +1527,17 @@ void analyze(vector<Statement> *statements)
 						continue;
 					}
 
-					symbol_table[var.name] = {var.name, var.type, var.initialized, var.expression};
+					symbol_table[var.name] = {var.name, var.type, var.initialized};
 					declaredVariables.push_back(var);
 				}
 			}
 		}
 		else if (statement.type == "ASSIGNMENT")
 		{
+			Variable var;
+			var.type;
+			var.name;
+			var.initialized;
 
 			for (int i = 0; i < statement.tokens.size(); i++) // Read each tokens of each statement
 			{
@@ -1545,63 +1545,24 @@ void analyze(vector<Statement> *statements)
 
 				if (currentToken.type == IDENTIFIER)
 				{
-					Variable var = symbol_table[currentToken.value];
+					var.name = currentToken.value;
 
-					if (statement.tokens[i + 1].type == ASSIGN_OP) // identifier comes before assignment operator ('=') which mean LHS variable
+					if (symbol_table.count(var.name) == 0)
 					{
-						var.initialized = true;
-						var.type = symbol_table[currentToken.value].type;
-
-						// CHECK DATA TYPE OF TOKENS between '=' and ',' or ';'
-						int j = i + 2; // select token after ASSIGN_OP
-						currentToken = (statement.tokens)[j];
-						while (currentToken.value != "," && currentToken.value != ";")
+						statement.validity = false;
+						cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not declared" << endl;
+						statement.message = "Identifier/variable '" + currentToken.value + "' is not declared";
+						errors.push_back({statement.line, statement.message});
+						break;
+					}
+					else if (symbol_table.count(currentToken.value) > 0)
+					{
+						Variable variable = symbol_table[currentToken.value];
+						if (!variable.initialized)
 						{
-							var.expression.push_back(currentToken);
-
-							if (symbol_table.count(var.name) == 0) // check if variable was not declared
-							{
-								statement.validity = false;
-								cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not declared" << endl;
-								statement.message = "Identifier/variable '" + currentToken.value + "' is not declared";
-								errors.push_back({statement.line, statement.message});
-								break;
-							}
-
-							if (symbol_table.count(currentToken.value) > 0)
-							{
-								Variable variable = symbol_table[currentToken.value];
-								if (!variable.initialized)
-								{
-									cout << "Line " << statement.line << " : variable '" << currentToken.value << "' not initialized" << endl;
-									statement.message = "Variable '" + currentToken.value + "' not initialized";
-									errors.push_back({statement.line, statement.message});
-								}
-							}
-							// check if token is identifier or constant
-							if (currentToken.type == CONSTANT)
-							{
-								string dataType = checkDataType((statement.tokens)[j]);
-
-								if ((var.type == "int" && dataType == "int") ||
-									(var.type == "float" && dataType == "float") ||
-									(var.type == "string" && dataType == "string") ||
-									(var.type == "bool" && dataType == "bool"))
-								{
-								}
-								else
-								{
-									cout << "Line " << statement.line << " : Invalid conversion from '" << dataType << "' to '" << var.type << endl;
-									statement.message = "Invalid conversion from '" + dataType + "' to '" + var.type + "'";
-									errors.push_back({statement.line, statement.message});
-								}
-							}
-							else if (currentToken.type == IDENTIFIER) // it's a variable so we check its data type instead
-							{
-							}
-
-							j++;
-							currentToken = (statement.tokens)[j];
+							cout << "Line " << statement.line << " : variable '" << currentToken.value << "' not initialized" << endl;
+							statement.message = "Variable '" + currentToken.value + "'";
+							errors.push_back({statement.line, statement.message});
 						}
 					}
 				}
@@ -1616,210 +1577,121 @@ void analyze(vector<Statement> *statements)
 	}
 }
 
-int solveExpression(vector<Token> expression)
-{
-	int accumulator = 0;
-	int i = 0;
-	int n = expression.size();
-
-	// Handle the case where the expression is just a single constant or identifier
-	if (n == 1)
-	{
-		Token token = expression[0];
-		if (token.type == CONSTANT)
-		{
-			return stoi(token.value);
-		}
-		else
-		{
-			// Look up the value of the identifier in the symbol table
-			// return symbol_table[token.value];
-		}
-	}
-
-	// Evaluate the expression using a simple left-to-right approach
-	while (i < n)
-	{
-		Token left = expression[i];
-		Token op = expression[i + 1];
-		Token right = expression[i + 2];
-		i += 3;
-
-		int leftValue, rightValue;
-
-
-
-		// Handle the left operand
-		if (left.type == CONSTANT)
-		{
-			leftValue = stoi(left.value);
-		}
-		else
-		{
-			// Look up the value of the identifier in the symbol table
-			// leftValue = symbol_table[left.value];
-		}
-
-		// Handle the right operand
-		if (right.type == CONSTANT)
-		{
-			rightValue = stoi(right.value);
-		}
-		else
-		{
-			// Look up the value of the identifier in the symbol table
-			// rightValue = symbol_table[right.value];
-		}
-
-		// Apply the operator
-		if (op.value == "+")
-		{
-			accumulator += leftValue + rightValue;
-		}
-		else if (op.value == "-")
-		{
-			accumulator += leftValue - rightValue;
-		}
-		else if (op.value == "*")
-		{
-			accumulator += leftValue * rightValue;
-		}
-		else if (op.value == "/")
-		{
-			accumulator += leftValue / rightValue;
-		}
-	}
-
-	return accumulator;
-}
-
 void printErrors(vector<Error> errors)
 {
 
 	sort(errors.begin(), errors.end(), [](const Error &e1, const Error &e2)
 		 { return e1.line < e2.line; });
 
-	// cout << "\n\n"
-	// 	 << "ERRORS" << endl;
-	// for (const auto &error : errors)
-	// {
-	// 	cout << "Line " << error.line << " :\t" << error.message << endl;
-	// }
-
-	ofstream file(outputFileSemantic);
-	if (file.is_open())
+	cout << "\n\n"
+		 << "ERRORS" << endl;
+	for (const auto &error : errors)
 	{
-
-		file << "\n\n"
-			 << "ERRORS" << endl;
-		for (int i=0; i < errors.size();i++  )
-		{
-			file << "Line " << errors[i].line << " :\t" << errors[i].message << endl;
-		}
+		cout << "Line " << error.line << " :\t" << error.message << endl;
 	}
-
-	file.close();
+    
 }
 
 struct interpret
 {
-	int numout;
-	string varname;
-	string stringout;
-	bool varbool;
+    int numout;
+    string varname;
+    string stringout;
+    bool varbool;
 	string type;
 	string solve;
 };
 
-void interOut(vector<Statement> *statements)
-{
-	int i = 0;
-	printf("interpreter Output\n");
+
+void interOut(vector<Statement> *statements){
+    int i = 0;
 	printf("Interpret\n");
 	int accumulator = 0;
 	string output = "";
 	interpret interpreter[100];
-	int a = 0;
-	for (Statement statement : *statements)
+	int a=0;
+		for (Statement statement : *statements)
 	{
-		if (statement.type == "DECLARATION")
-		{
-			for (i = 0; i < statement.tokens.size(); i++)
-			{
+		if (statement.type == "DECLARATION"){
+			for(i=0;i<statement.tokens.size();i++){
 				Token currentToken = (statement.tokens)[i];
-				if (currentToken.type == DATA_TYPE)
-				{
-					cout << "\nData type|";
+				if (currentToken.type == DATA_TYPE){
+					cout<< "\nData type|";
+				i++;
+				Token currentToken = (statement.tokens)[i];
+				if (currentToken.type == IDENTIFIER){
+					cout<< "Ident in dec|";
+					interpreter[a].varname = currentToken.value;
 					i++;
 					Token currentToken = (statement.tokens)[i];
-					if (currentToken.type == IDENTIFIER)
-					{
-						cout << "Ident in dec|";
-						interpreter[a].varname = currentToken.value;
+					if(currentToken.value == "="){
+						cout<< "=|";
 						i++;
 						Token currentToken = (statement.tokens)[i];
-						if (currentToken.value == "=")
+						for (int j=i;j<statement.tokens.size();j++)
 						{
-							cout << "=|";
-							i++;
-							Token currentToken = (statement.tokens)[i];
-							for (int j = i; j < statement.tokens.size(); j++)
+						Token currentToken = (statement.tokens)[j];
+							if (currentToken.value == ";")
 							{
-								Token currentToken = (statement.tokens)[j];
-								if (currentToken.value == ";")
-								{
 
-									cout << interpreter[a].solve;
-									cout << " here exit ";
-									a++;
-									break;
-								}
-								else
-								{
-									interpreter[a].solve = interpreter[a].solve + currentToken.value;
-								}
+								cout<< interpreter[a].solve;
+								cout<< " here exit ";
+								a++;
+								break;
+							}
+							else{
+								interpreter[a].solve = interpreter[a].solve + currentToken.value;
+
 							}
 						}
-						if (currentToken.value == ";")
-						{
-							a++;
+						
+					}
+					if (currentToken.value == ";"){
+						a++;
+					}
+				}
+				else{
+					//not an identifier
+				}
+				}
+			}
+		}
+       if(statement.type == "ASSIGNMENT"){ //check if it is an assignment type
+		for (i=0;i<statement.tokens.size();i++){ // checks all tokens
+		Token currentToken = (statement.tokens)[i];
+			if(currentToken.type == IDENTIFIER){
+				cout << "\nident in ass\n";
+			}
+			else{
+				//not an identifier
+			}
+		}
+	   }
+	   else{
+		for(i=0;i<statement.tokens.size();i++){
+		Token currentToken = (statement.tokens)[i];
+			if (currentToken.value == "tignan")
+			{
+				printf("\ntignan: ");
+				i=i+2;
+				Token currentToken = (statement.tokens)[i];
+				if (currentToken.type == IDENTIFIER){
+					for(int j =0; j<100; j++){
+						if(currentToken.value==interpreter[j].varname){
+							cout<< interpreter[j].solve; // insert pag call ng converter to solving
 						}
 					}
-					else
-					{
-						// not an identifier
-					}
 				}
 			}
+			
 		}
-		if (statement.type == "ASSIGNMENT")
-		{ // check if it is an assignment type
-			for (i = 0; i < statement.tokens.size(); i++)
-			{ // checks all tokens
-				Token currentToken = (statement.tokens)[i];
-				if (currentToken.type == IDENTIFIER)
-				{
-					cout << "\nident in ass\n";
-				}
-				else
-				{
-					// not an identifier
-				}
-			}
-		}
-		else
-		{
-			for (i = 0; i < statement.tokens.size(); i++)
-			{
-				Token currentToken = (statement.tokens)[i];
-				if (currentToken.value == "tignan")
-				{
-					printf("\ntignan\n");
-				}
-			}
-		}
+	   }
 	}
 }
+
+
+
+
 
 int main()
 {
@@ -1855,11 +1727,16 @@ int main()
 			printTokens(tokens);
 			vector<Statement> statements = parse(&tokens);
 			testStatementTokens(statements);
+			// printSyntax(statements);
+            
 			analyze(&statements);
-			printErrors(errors);
-
-			interOut(&statements);
-
+				printf("interOut\n");
+				interOut(&statements);
+	
+			//	printf("error out");
+			//printErrors(errors);
+		
+        
 		}
 		else
 		{
