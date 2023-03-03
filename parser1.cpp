@@ -1382,6 +1382,9 @@ struct Variable
 map<string, Variable> symbol_table;
 vector<Variable> declaredVariables;
 
+map<string, Variable> solveVariables(map<string, Variable> symbol_table); 
+
+
 string checkDataType(Token token)
 {
 	string dataType;
@@ -1405,6 +1408,7 @@ string checkDataType(Token token)
 
 	return dataType;
 }
+
 
 void analyze(vector<Statement> *statements)
 {
@@ -1628,6 +1632,9 @@ void analyze(vector<Statement> *statements)
 				}
 			}
 		}
+
+		symbol_table = solveVariables(symbol_table);
+
 	}
 
 	cout << "\n\n"
@@ -1645,9 +1652,14 @@ int solveExpression(vector<Token> expression)
 	int i = 0;
 	int n = expression.size();
 
+			cout << "debug seembol table x = " << symbol_table["x"].value << endl;
+	
+
 	// Handle the case where the expression is just a single constant or identifier
 	if (n == 1)
 	{
+		
+
 		Token token = expression[0];
 		if (token.type == CONSTANT)
 		{
@@ -1655,12 +1667,16 @@ int solveExpression(vector<Token> expression)
 		}
 		else
 		{
+			// cout << "debug seembol table x = " << symbol_table["x"].value << endl;
+
+
 			int varValue;
 			// Look up the value of the identifier in the symbol table
 			// cout << "debug solveExp -- of " << token.value << " = " << symbol_table[token.value].value << endl;
 			return symbol_table[token.value].value;
 		}
 	}
+	
 
 	// Evaluate the expression using a simple left-to-right approach
 	while (i < n)
@@ -1680,7 +1696,6 @@ int solveExpression(vector<Token> expression)
 		else
 		{
 			// Look up the value of the identifier in the symbol table
-			cout << "debug seembol table x = " << symbol_table["x"].value << endl;
 			leftValue = symbol_table[left.value].value;
 		}
 
@@ -1717,7 +1732,7 @@ int solveExpression(vector<Token> expression)
 	return accumulator;
 }
 
-map<string, Variable> solveVariables(map<string, Variable> symbol_table)
+map<string, Variable> solveVariables(map<string, Variable> symbol_table) // updates the symbol table
 {
 
 	Variable var;
@@ -1876,14 +1891,21 @@ void interOut(vector<Statement> *statements)
 						else
 						{
 							outputExpression.push_back(statement.tokens[j]);
-							int outValue = solveExpression(outputExpression);
-							cout << outValue << endl;
 						}
 						j++;
 					}
 					i = j;
 				}
 			}
+
+			for (int i = 0; i < outputExpression.size(); i++)
+			{
+				cout << outputExpression[i].value << " " << endl;
+			}
+
+			int outValue = solveExpression(outputExpression);
+
+			cout << outValue << endl;
 
 			// for (int i = 0; i < outputExpression.size(); i++)
 			// {
@@ -1950,7 +1972,6 @@ int main()
 
 			printErrors(errors);
 
-			symbol_table = solveVariables(symbol_table);
 			interOut(&statements);
 		}
 		else
