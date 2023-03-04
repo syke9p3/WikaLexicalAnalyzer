@@ -25,7 +25,7 @@ Members:
 
 using namespace std;
 
-string fileName = "clarence.wika";
+string fileName = "a_test.wika";
 string outputFileLexer = "output_Lexer.wika";
 string outputFileParser = "output_Parser.wika";
 
@@ -1585,6 +1585,8 @@ void printErrors(vector<Error> errors)
 
 	cout << "\n\n"
 		 << "ERRORS" << endl;
+
+		 
 	for (const auto &error : errors)
 	{
 		cout << "Line " << error.line << " :\t" << error.message << endl;

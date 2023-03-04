@@ -1366,20 +1366,16 @@ enum DataType
 	OP
 };
 
-struct Expression
-{
-	map<Token, DataType> expression;
-};
-
 struct Variable
 {
 	string name;
 	string type;
 	bool initialized = false;
-	Expression value;
+	vector<Token> expression;
+	int value;
 };
 
-unordered_map<string, Variable> symbol_table;
+map<string, Variable> symbol_table;
 
 string checkDataType(Token token)
 {
@@ -1573,11 +1569,147 @@ void checkErrors(vector<Statement> *statements)
 			}
 		}
 	}
+}
+
+int solveExpression(vector<Token> expression)
+{
+
+	int accumulator = 0;
+	int i = 0;
+	int n = expression.size();
+
+	// Handle the case where the expression is just a single constant or identifier
+	if (n == 1)
+	{
+
+		Token token = expression[0];
+		if (token.type == CONSTANT)
+		{
+			return stoi(token.value);
+		}
+		else
+		{
+			// cout << "debug seembol table x = " << symbol_table["x"].value << endl;
+
+			int varValue;
+			// Look up the value of the identifier in the symbol table
+			// cout << "debug solveExp -- of " << token.value << " = " << symbol_table[token.value].value << endl;
+			return symbol_table[token.value].value;
+		}
+	}
+
+	// Evaluate the expression using a simple left-to-right approach
+	while (i < n)
+	{
+		Token left = expression[i];
+		Token op = expression[i + 1];
+		Token right = expression[i + 2];
+		i += 3;
+
+		int leftValue, rightValue;
+
+		// Handle the left operand
+		if (left.type == CONSTANT)
+		{
+			leftValue = stoi(left.value);
+		}
+		else
+		{
+			// Look up the value of the identifier in the symbol table
+			leftValue = symbol_table[left.value].value;
+		}
+
+		// Handle the right operand
+		if (right.type == CONSTANT)
+		{
+			rightValue = stoi(right.value);
+		}
+		else
+		{
+			// Look up the value of the identifier in the symbol table
+			rightValue = symbol_table[right.value].value;
+		}
+
+		// Apply the operator
+		if (op.value == "+")
+		{
+			accumulator += leftValue + rightValue;
+		}
+		else if (op.value == "-")
+		{
+			accumulator += leftValue - rightValue;
+		}
+		else if (op.value == "*")
+		{
+			accumulator += leftValue * rightValue;
+		}
+		else if (op.value == "/")
+		{
+			accumulator += leftValue / rightValue;
+		}
+	}
+
+	return accumulator;
+}
+
+void getVariableValue(vector<Statement> *statements)
+{
+
+	for (Statement statement : *statements)
+	{
+		vector<Variable> declaredVariables;
+
+		Variable var;
+		var.type;
+		var.name;
+		var.initialized;
+		var.expression;
+		var.value;
+
+		for (int i = 0; i < statement.tokens.size(); i++) // Read each tokens of the current statement
+		{
+			Token currentToken = (statement.tokens)[i];
+
+			if (currentToken.type == IDENTIFIER && statement.tokens[i + 1].type == ASSIGN_OP)
+			{
+				var.name = currentToken.value;
+
+				int j = i + 2; // select token after ASSIGN_OP
+				currentToken = (statement.tokens)[j];
+
+				symbol_table[var.name].expression.clear();
+
+				while (currentToken.value != "," && currentToken.value != ";")
+				{
+
+					symbol_table[var.name].expression.push_back(currentToken);
+					j++;
+					currentToken = (statement.tokens)[j];
+				}
+
+				symbol_table[var.name].value = solveExpression(symbol_table[var.name].expression);
+			}
+		}
+	}
+}
+
+void printVariableSymbolTable()
+{
 	cout << "\n\n"
 		 << "VARIABLE SYMBOL TABLE CONTENTS: " << endl;
-	for (auto &pair : symbol_table)
+	for (auto &variable : symbol_table)
 	{
-		std::cout << pair.first << ", data type id: " << pair.second.type << " (initialized: " << pair.second.initialized << ")" << std::endl;
+
+		string expTokens;
+		for (int i = 0; i < variable.second.expression.size(); i++)
+		{
+
+			Token currentToken = variable.second.expression[i];
+
+			expTokens += currentToken.value + " ";
+		}
+
+		cout << variable.first << ", data type: " << variable.second.type << " | initialized: " << variable.second.initialized << " | expression: " << expTokens << " | value: " << variable.second.value << endl;
 	}
 }
 
@@ -1639,13 +1771,25 @@ int main()
 				input += line + '\n';
 			}
 			file.close();
+
+			// Lexical
 			vector<Token> tokens = tokenize(input);
 			printTokens(tokens);
+
+			// Syntax
 			vector<Statement> statements = parse(&tokens);
 			testStatementTokens(statements);
-			// printSyntax(statements);
+
+			// Semantic
 			checkErrors(&statements);
 			printErrors(errors);
+
+			// Interpreter
+			if (errors.size() == 0)
+			{
+				getVariableValue(&statements);
+				printVariableSymbolTable();
+			}
 		}
 		else
 		{
