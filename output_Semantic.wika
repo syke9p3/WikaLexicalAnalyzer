@@ -4,9 +4,11 @@ ERRORS
 Line 2 :	Multiple declarations for identifier/variable 'repeat'
 Line 3 :	Invalid conversion from 'float' to 'int'
 Line 4 :	Identifier/variable 'y' is not declared
-Line 6 :	Expected expression but got keyword 'habang'
-Line 8 :	Variable 'b' not initialized
-Line 10 :	Invalid conversion from 'string' to 'int'
-Line 10 :	Multiple declarations for identifier/variable 'x'
-Line 13 :	Identifier/variable  'year' is not declared
-Line 14 :	Identifier/variable 'year' is not declared
+Line 9 :	Invalid conversion from 'string' to 'int'
+Line 9 :	Multiple declarations for identifier/variable 'x'
+Line 12 :	Identifier/variable  'year' is not declared
+Line 13 :	Identifier/variable 'year' is not declared
+Line 15 :	Expected expression but got keyword 'habang'
+Line 18 :	Invalid conversion from 'string' to 'int'
+Line 21 :	Identifier/variable 'z' is not declared
+Line 24 :	Identifier/variable 'e' is not declared

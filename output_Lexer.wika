@@ -36,65 +36,114 @@ LINE			INDEX			TOKEN				TYPE			DESCRIPTION
 5			29			
 				New Line Character
 6			30			int				dataType			Integer Data Type
-6			31			keyword				IDENTIFIER		Identifier keyword
-6			32			=				ASSIGN_OP			Assignment Operator
-6			33			habang				KEYWORD			Repetition Statement
-6			34			+				ARITH_OP				Addition Symbol
-6			35			1				CONSTANT		Integer Constant Value
-6			36			;				SEMICOLON				Semicolon
-6			37			
+6			31			b				IDENTIFIER		Identifier b
+6			32			;				SEMICOLON				Semicolon
+6			33			
 				New Line Character
-7			38			int				dataType			Integer Data Type
-7			39			b				IDENTIFIER		Identifier b
-7			40			;				SEMICOLON				Semicolon
-7			41			
+7			34			b				IDENTIFIER		Identifier b
+7			35			=				ASSIGN_OP			Assignment Operator
+7			36			x				IDENTIFIER		Identifier x
+7			37			+				ARITH_OP				Addition Symbol
+7			38			8				CONSTANT		Integer Constant Value
+7			39			;				SEMICOLON				Semicolon
+7			40			
 				New Line Character
-8			42			b				IDENTIFIER		Identifier b
-8			43			=				ASSIGN_OP			Assignment Operator
-8			44			x				IDENTIFIER		Identifier x
-8			45			+				ARITH_OP				Addition Symbol
-8			46			8				CONSTANT		Integer Constant Value
-8			47			;				SEMICOLON				Semicolon
-8			48			
+8			41			
 				New Line Character
-9			49			
+9			42			int				dataType			Integer Data Type
+9			43			x				IDENTIFIER		Identifier x
+9			44			=				ASSIGN_OP			Assignment Operator
+9			45			9				CONSTANT		Integer Constant Value
+9			46			+				ARITH_OP				Addition Symbol
+9			47			"				DELIMITER				Delimiter Double Quotation
+9			48			Hello				CONSTANT		String Constant Value
+9			49			"				DELIMITER				Delimiter Double Quotation
+9			50			;				SEMICOLON				Semicolon
+9			51			
 				New Line Character
-10			50			int				dataType			Integer Data Type
-10			51			x				IDENTIFIER		Identifier x
-10			52			=				ASSIGN_OP			Assignment Operator
-10			53			9				CONSTANT		Integer Constant Value
-10			54			+				ARITH_OP				Addition Symbol
-10			55			"				DELIMITER				Delimiter Double Quotation
-10			56			Hello				CONSTANT		String Constant Value
-10			57			"				DELIMITER				Delimiter Double Quotation
-10			58			;				SEMICOLON				Semicolon
-10			59			
+10			52			
 				New Line Character
+11			53			string				dataType			String Data Type
+11			54			name				IDENTIFIER		Identifier name
+11			55			=				ASSIGN_OP			Assignment Operator
+11			56			"				DELIMITER				Delimiter Double Quotation
+11			57			hello				CONSTANT		String Constant Value
+11			58			"				DELIMITER				Delimiter Double Quotation
+11			59			;				SEMICOLON				Semicolon
 11			60			
 				New Line Character
-12			61			string				dataType			String Data Type
-12			62			name				IDENTIFIER		Identifier name
+12			61			int				dataType			Integer Data Type
+12			62			age				IDENTIFIER		Identifier age
 12			63			=				ASSIGN_OP			Assignment Operator
-12			64			"				DELIMITER				Delimiter Double Quotation
-12			65			hello				CONSTANT		String Constant Value
-12			66			"				DELIMITER				Delimiter Double Quotation
-12			67			;				SEMICOLON				Semicolon
-12			68			
+12			64			1				CONSTANT		Integer Constant Value
+12			65			+				ARITH_OP				Addition Symbol
+12			66			year				IDENTIFIER		Identifier year
+12			67			,				DELIMITER				Comma
+12			68			a				IDENTIFIER		Identifier a
+12			69			;				SEMICOLON				Semicolon
+12			70			
 				New Line Character
-13			69			int				dataType			Integer Data Type
-13			70			age				IDENTIFIER		Identifier age
-13			71			=				ASSIGN_OP			Assignment Operator
-13			72			1				CONSTANT		Integer Constant Value
-13			73			+				ARITH_OP				Addition Symbol
-13			74			year				IDENTIFIER		Identifier year
-13			75			,				DELIMITER				Comma
-13			76			a				IDENTIFIER		Identifier a
-13			77			;				SEMICOLON				Semicolon
-13			78			
+13			71			year				IDENTIFIER		Identifier year
+13			72			=				ASSIGN_OP			Assignment Operator
+13			73			age				IDENTIFIER		Identifier age
+13			74			;				SEMICOLON				Semicolon
+13			75			
 				New Line Character
-14			79			year				IDENTIFIER		Identifier year
-14			80			=				ASSIGN_OP			Assignment Operator
-14			81			age				IDENTIFIER		Identifier age
-14			82			;				SEMICOLON				Semicolon
-14			83			
+14			76			
+				New Line Character
+15			77			int				dataType			Integer Data Type
+15			78			keyword				IDENTIFIER		Identifier keyword
+15			79			=				ASSIGN_OP			Assignment Operator
+15			80			habang				KEYWORD			Repetition Statement
+15			81			+				ARITH_OP				Addition Symbol
+15			82			1				CONSTANT		Integer Constant Value
+15			83			;				SEMICOLON				Semicolon
+15			84			
+				New Line Character
+16			85			
+				New Line Character
+17			86			
+				New Line Character
+18			87			int				dataType			Integer Data Type
+18			88			a				IDENTIFIER		Identifier a
+18			89			=				ASSIGN_OP			Assignment Operator
+18			90			"				DELIMITER				Delimiter Double Quotation
+18			91			hello				CONSTANT		String Constant Value
+18			92			"				DELIMITER				Delimiter Double Quotation
+18			93			;				SEMICOLON				Semicolon
+18			94			
+				New Line Character
+19			95			
+				New Line Character
+20			96			int				dataType			Integer Data Type
+20			97			c				IDENTIFIER		Identifier c
+20			98			=				ASSIGN_OP			Assignment Operator
+20			99			9				CONSTANT		Integer Constant Value
+20			100			;				SEMICOLON				Semicolon
+20			101			
+				New Line Character
+21			102			c				IDENTIFIER		Identifier c
+21			103			=				ASSIGN_OP			Assignment Operator
+21			104			b				IDENTIFIER		Identifier b
+21			105			+				ARITH_OP				Addition Symbol
+21			106			z				IDENTIFIER		Identifier z
+21			107			;				SEMICOLON				Semicolon
+21			108			
+				New Line Character
+22			109			
+				New Line Character
+23			110			int				dataType			Integer Data Type
+23			111			d				IDENTIFIER		Identifier d
+23			112			;				SEMICOLON				Semicolon
+23			113			
+				New Line Character
+24			114			e				IDENTIFIER		Identifier e
+24			115			=				ASSIGN_OP			Assignment Operator
+24			116			d				IDENTIFIER		Identifier d
+24			117			+				ARITH_OP				Addition Symbol
+24			118			8				CONSTANT		Integer Constant Value
+24			119			;				SEMICOLON				Semicolon
+24			120			
+				New Line Character
+25			121			
 				New Line Character

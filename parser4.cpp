@@ -25,11 +25,11 @@ Members:
 
 using namespace std;
 
-string fileName = "clarence.wika";
+string fileName = "a_test.wika";
 string outputFileLexer = "output_Lexer.wika";
 string outputFileParser = "output_Parser.wika";
 string outputFileSemantic = "output_Semantic.wika";
-
+string outputFileInterpreter = "output_Interpreter.wika";
 /*============================= LEXER ========================================================================*/
 
 void debug(string varName = " ", string value = " ")
@@ -99,7 +99,7 @@ string stringify(TokenType token)
 struct Token
 {
 	TokenType type;
-	string value;
+	string lexeme;
 	string description;
 	int line;
 };
@@ -416,7 +416,7 @@ void printTokens(vector<Token> tokens)
 			file << i
 				 << "\t\t\t"; // INDEXF
 			file
-				<< tokens[i].value
+				<< tokens[i].lexeme
 				<< "\t\t\t\t"; // TOKEN
 			switch (tokens[i].type)
 			{ // TOKEN TYPE
@@ -493,7 +493,7 @@ struct Statement
 
 string but_got(Token token)
 {
-	string but_got = "but got " + stringify(token.type) + " '" + token.value + "'"; // + " \e[3m\u001b[31;1m" + token.value + "\e[0m\u001b[0m"
+	string but_got = "but got " + stringify(token.type) + " '" + token.lexeme + "'"; // + " \e[3m\u001b[31;1m" + token.value + "\e[0m\u001b[0m"
 	return but_got;
 }
 
@@ -503,7 +503,7 @@ void parse_rest(vector<Token> *tokens, Statement *currentStatement, int *j)
 	Token currentToken = (*tokens)[k];
 	while (k < (*tokens).size())
 	{
-		if (currentToken.value != "\n" && !((*currentStatement).validity))
+		if (currentToken.lexeme != "\n" && !((*currentStatement).validity))
 		{
 			// tokens that does not need space
 			if (currentToken.type == SEMICOLON ||
@@ -513,11 +513,11 @@ void parse_rest(vector<Token> *tokens, Statement *currentStatement, int *j)
 				currentToken.type == REL_OP ||
 				currentToken.type == LOG_OP)
 			{
-				(*currentStatement).syntax += currentToken.value;
+				(*currentStatement).syntax += currentToken.lexeme;
 			}
 			else
 			{
-				(*currentStatement).syntax += " " + currentToken.value;
+				(*currentStatement).syntax += " " + currentToken.lexeme;
 			}
 			k++;
 			currentToken = (*tokens)[k];
@@ -544,27 +544,27 @@ Statement parseFactor(vector<Token> *tokens, int *i)
 
 	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER)
 	{
-		factor.syntax += " " + currentToken.value;
+		factor.syntax += " " + currentToken.lexeme;
 		factor.tokens.push_back(currentToken);
 		j++;
 		currentToken = (*tokens)[j];
 	}
-	else if (currentToken.value == "\"") // a string
+	else if (currentToken.lexeme == "\"") // a string
 	{
-		factor.syntax += " " + currentToken.value;
+		factor.syntax += " " + currentToken.lexeme;
 		factor.tokens.push_back(currentToken);
 		j++;
 		currentToken = (*tokens)[j];
 		if (currentToken.type == CONSTANT)
 		{
-			factor.syntax += " " + currentToken.value;
+			factor.syntax += " " + currentToken.lexeme;
 			factor.tokens.push_back(currentToken);
 			j++;
 			currentToken = (*tokens)[j];
 
-			if (currentToken.value == "\"")
+			if (currentToken.lexeme == "\"")
 			{
-				factor.syntax += " " + currentToken.value;
+				factor.syntax += " " + currentToken.lexeme;
 				factor.tokens.push_back(currentToken);
 			}
 			else
@@ -603,7 +603,7 @@ Statement parseTerm(vector<Token> *tokens, int *i)
 	term.message = "";
 	term.tokens;
 
-	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER || currentToken.value == "\"")
+	if (currentToken.type == CONSTANT || currentToken.type == IDENTIFIER || currentToken.lexeme == "\"")
 	{
 
 		Statement factor = parseFactor(tokens, &j);
@@ -612,16 +612,16 @@ Statement parseTerm(vector<Token> *tokens, int *i)
 		{
 			term.syntax += " " + factor.syntax;
 			term.tokens.insert(term.tokens.end(), factor.tokens.begin(), factor.tokens.end());
-			if (currentToken.value == "\"")
+			if (currentToken.lexeme == "\"")
 			{
 				j++;
 				currentToken = (*tokens)[j];
 			}
 			currentToken = (*tokens)[j];
 
-			if (currentToken.value == "*" || currentToken.value == "/")
+			if (currentToken.lexeme == "*" || currentToken.lexeme == "/")
 			{
-				term.syntax += " " + currentToken.value;
+				term.syntax += " " + currentToken.lexeme;
 				term.tokens.push_back(currentToken);
 				j++;
 				currentToken = (*tokens)[j];
@@ -639,7 +639,7 @@ Statement parseTerm(vector<Token> *tokens, int *i)
 					term.message = "Expected a term";
 				}
 			}
-			else if (currentToken.value == ";" || currentToken.value == ",")
+			else if (currentToken.lexeme == ";" || currentToken.lexeme == ",")
 			{
 			}
 			else
@@ -679,7 +679,7 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 	expression.message = "";
 	expression.tokens;
 
-	if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER || currentToken.value == "\""))
+	if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER || currentToken.lexeme == "\""))
 	{
 
 		Statement term = parseTerm(tokens, &j);
@@ -691,9 +691,9 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 
 			currentToken = (*tokens)[j];
 
-			if (currentToken.value == "+" || currentToken.value == "-")
+			if (currentToken.lexeme == "+" || currentToken.lexeme == "-")
 			{
-				expression.syntax += " " + currentToken.value;
+				expression.syntax += " " + currentToken.lexeme;
 				expression.tokens.push_back(currentToken);
 				j++;
 				currentToken = (*tokens)[j];
@@ -709,7 +709,7 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 					return expression;
 				}
 			}
-			else if (currentToken.value == ";" || currentToken.value == ",")
+			else if (currentToken.lexeme == ";" || currentToken.lexeme == ",")
 			{
 			}
 			else
@@ -718,7 +718,7 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 				expression.message = "Expected operator or ;";
 			}
 		}
-		else if (currentToken.value == ";" || currentToken.value == ",")
+		else if (currentToken.lexeme == ";" || currentToken.lexeme == ",")
 		{
 		}
 		else
@@ -727,12 +727,12 @@ Statement parseExpression(vector<Token> *tokens, int *i)
 			expression.message = "Expected expression " + but_got(currentToken);
 		}
 	}
-	else if (currentToken.value == ";")
+	else if (currentToken.lexeme == ";")
 	{
 	}
-	else if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER) && (*tokens)[j + 1].value != ";")
+	else if ((currentToken.type == CONSTANT || currentToken.type == IDENTIFIER) && (*tokens)[j + 1].lexeme != ";")
 	{
-		expression.syntax += " " + currentToken.value;
+		expression.syntax += " " + currentToken.lexeme;
 		expression.tokens.push_back(currentToken);
 		j++;
 		currentToken = (*tokens)[j];
@@ -772,37 +772,37 @@ Statement parseOutput(vector<Token> *tokens, int *i)
 	output.validity = true;
 	output.message = "";
 
-	if (currentToken.type == KEYWORD && currentToken.value == "tignan")
+	if (currentToken.type == KEYWORD && currentToken.lexeme == "tignan")
 	{
-		output.syntax += " " + currentToken.value;
+		output.syntax += " " + currentToken.lexeme;
 		output.tokens.push_back(currentToken);
 		j++;
 		currentToken = (*tokens)[j];
 
-		if (currentToken.value == "(")
+		if (currentToken.lexeme == "(")
 		{
-			output.syntax += " " + currentToken.value;
+			output.syntax += " " + currentToken.lexeme;
 			output.tokens.push_back(currentToken);
 			j++;
 			currentToken = (*tokens)[j];
 
 			if (currentToken.type == IDENTIFIER) // check if variable
 			{
-				output.syntax += " " + currentToken.value;
+				output.syntax += " " + currentToken.lexeme;
 				output.tokens.push_back(currentToken);
 				j++;
 				currentToken = (*tokens)[j];
 
-				if (currentToken.value == ")")
+				if (currentToken.lexeme == ")")
 				{
-					output.syntax += " " + currentToken.value;
+					output.syntax += " " + currentToken.lexeme;
 					output.tokens.push_back(currentToken);
 					j++;
 					currentToken = (*tokens)[j];
 
-					if (currentToken.value == ";")
+					if (currentToken.lexeme == ";")
 					{
-						output.syntax += " " + currentToken.value;
+						output.syntax += " " + currentToken.lexeme;
 						output.tokens.push_back(currentToken);
 					}
 					else
@@ -812,36 +812,36 @@ Statement parseOutput(vector<Token> *tokens, int *i)
 					}
 				}
 			}
-			else if (currentToken.value == "\"") // check if string data type
+			else if (currentToken.lexeme == "\"") // check if string data type
 			{
-				output.syntax += "" + currentToken.value;
+				output.syntax += "" + currentToken.lexeme;
 				output.tokens.push_back(currentToken);
 				j++;
 				currentToken = (*tokens)[j];
 
 				if (currentToken.type == CONSTANT)
 				{
-					output.syntax += "" + currentToken.value;
+					output.syntax += "" + currentToken.lexeme;
 					output.tokens.push_back(currentToken);
 					j++;
 					currentToken = (*tokens)[j];
 
-					if (currentToken.value == "\"")
+					if (currentToken.lexeme == "\"")
 					{
-						output.syntax += "" + currentToken.value;
+						output.syntax += "" + currentToken.lexeme;
 						output.tokens.push_back(currentToken);
 						j++;
 						currentToken = (*tokens)[j];
-						if (currentToken.value == ")")
+						if (currentToken.lexeme == ")")
 						{
-							output.syntax += "" + currentToken.value;
+							output.syntax += "" + currentToken.lexeme;
 							output.tokens.push_back(currentToken);
 							j++;
 							currentToken = (*tokens)[j];
 
-							if (currentToken.value == ";")
+							if (currentToken.lexeme == ";")
 							{
-								output.syntax += " " + currentToken.value;
+								output.syntax += " " + currentToken.lexeme;
 								output.tokens.push_back(currentToken);
 							}
 							else
@@ -872,6 +872,7 @@ Statement parseOutput(vector<Token> *tokens, int *i)
 	}
 
 	*i = j;
+	output.type = "OUTPUT";
 	return output;
 }
 
@@ -890,14 +891,14 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 
 	if (currentToken.type == IDENTIFIER)
 	{
-		variables.syntax += " " + currentToken.value;
+		variables.syntax += " " + currentToken.lexeme;
 		variables.tokens.push_back(currentToken);
 		j++;
 		currentToken = (*tokens)[j];
 
-		if (currentToken.value == "=")
+		if (currentToken.lexeme == "=")
 		{
-			variables.syntax += " " + currentToken.value;
+			variables.syntax += " " + currentToken.lexeme;
 			variables.tokens.push_back(currentToken);
 			j++;
 			currentToken = (*tokens)[j];
@@ -909,9 +910,9 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 				variables.tokens.insert(variables.tokens.end(), expression.tokens.begin(), expression.tokens.end());
 				currentToken = (*tokens)[j];
 
-				if (currentToken.value == ",")
+				if (currentToken.lexeme == ",")
 				{
-					variables.syntax += "" + currentToken.value;
+					variables.syntax += "" + currentToken.lexeme;
 					j++;
 					Statement variables2 = parseVariables(tokens, &j);
 
@@ -935,10 +936,10 @@ Statement parseVariables(vector<Token> *tokens, int *i)
 				// errors.push_back({variables.line, variables.message});
 			}
 		}
-		else if (currentToken.value == ",")
+		else if (currentToken.lexeme == ",")
 		{
 
-			variables.syntax += currentToken.value;
+			variables.syntax += currentToken.lexeme;
 			variables.tokens.push_back(currentToken);
 			j++;
 
@@ -987,7 +988,7 @@ Statement parseDeclaration(vector<Token> *tokens, int *i)
 	// Check for the presence of data type
 	if (currentToken.type == DATA_TYPE)
 	{
-		declaration.syntax += currentToken.value;
+		declaration.syntax += currentToken.lexeme;
 		declaration.tokens.push_back(currentToken);
 		j++;
 		currentToken = (*tokens)[j];
@@ -1003,9 +1004,9 @@ Statement parseDeclaration(vector<Token> *tokens, int *i)
 			currentToken = (*tokens)[j];
 
 			// Check for the presence of ;
-			if (currentToken.value == ";")
+			if (currentToken.lexeme == ";")
 			{
-				declaration.syntax += currentToken.value;
+				declaration.syntax += currentToken.lexeme;
 				declaration.tokens.push_back(currentToken);
 				// End of declaration syntax so no need to increment
 			}
@@ -1053,14 +1054,14 @@ Statement parseAssignment(vector<Token> *tokens, int *i)
 
 	if (currentToken.type == IDENTIFIER)
 	{
-		assignment.syntax += currentToken.value;
+		assignment.syntax += currentToken.lexeme;
 		assignment.tokens.push_back(currentToken);
 		j++;
 		currentToken = (*tokens)[j];
 
 		if (currentToken.type == ASSIGN_OP)
 		{
-			assignment.syntax += " " + currentToken.value;
+			assignment.syntax += " " + currentToken.lexeme;
 			assignment.tokens.push_back(currentToken);
 			j++;
 			currentToken = (*tokens)[j];
@@ -1071,9 +1072,9 @@ Statement parseAssignment(vector<Token> *tokens, int *i)
 				assignment.tokens.insert(assignment.tokens.end(), expression.tokens.begin(), expression.tokens.end());
 				currentToken = (*tokens)[j];
 
-				if (currentToken.value == ";")
+				if (currentToken.lexeme == ";")
 				{
-					assignment.syntax += "" + currentToken.value;
+					assignment.syntax += "" + currentToken.lexeme;
 					assignment.tokens.push_back(currentToken);
 				}
 				else
@@ -1124,7 +1125,7 @@ Statement parseStatement(vector<Token> *tokens, int *i)
 	{
 	case SEMICOLON:
 		statement.line = currentToken.line;
-		statement.syntax = currentToken.value;
+		statement.syntax = currentToken.lexeme;
 		statement.validity = true;
 		statement.message = "";
 		break;
@@ -1158,7 +1159,7 @@ Statement parseStatement(vector<Token> *tokens, int *i)
 	// 	break;
 	case COMMENT:
 		statement.line = currentToken.line;
-		statement.syntax = currentToken.value;
+		statement.syntax = currentToken.lexeme;
 		statement.validity = true;
 		statement.message = "";
 		break;
@@ -1169,7 +1170,7 @@ Statement parseStatement(vector<Token> *tokens, int *i)
 	// 	}
 	// 	break;
 	case KEYWORD:
-		if (currentToken.value == "tignan")
+		if (currentToken.lexeme == "tignan")
 		{
 			statement = parseOutput(tokens, i);
 		}
@@ -1189,7 +1190,7 @@ Statement parseStatement(vector<Token> *tokens, int *i)
 	default:
 		if (currentToken.type == CONSTANT)
 		{
-			cout << "I expect " << currentToken.value << endl;
+			cout << "I expect " << currentToken.lexeme << endl;
 		}
 		// int j = *i;
 		// Statement invalidStatement;
@@ -1228,8 +1229,8 @@ Statement parseStatement(vector<Token> *tokens, int *i)
 
 		statement.line = currentToken.line;
 		statement.validity = false;
-		statement.message = "Unexpected token " + stringify(currentToken.type) + " '" + currentToken.value + "'";
-		if (currentToken.value != "\n")
+		statement.message = "Unexpected token " + stringify(currentToken.type) + " '" + currentToken.lexeme + "'";
+		if (currentToken.lexeme != "\n")
 		{
 			// errors.push_back({statement.line, statement.message});
 		}
@@ -1248,7 +1249,7 @@ vector<Statement> parse(vector<Token> *tokens)
 	{
 		Token currentToken = (*tokens)[i];
 
-		if (currentToken.value == "\n")
+		if (currentToken.lexeme == "\n")
 		{
 			continue;
 		}
@@ -1306,7 +1307,7 @@ void testStatementTokens(vector<Statement> statements)
 
 		for (int i = 0; i < statement.tokens.size(); i++)
 		{
-			cout << statement.tokens[i].value << " ";
+			cout << statement.tokens[i].lexeme << " ";
 		}
 		cout << "\t\t\t\t";
 		cout << statement.type;
@@ -1332,7 +1333,7 @@ void testStatementTokens(vector<Statement> statements)
 
 			for (int i = 0; i < statement.tokens.size(); i++)
 			{
-				file << statement.tokens[i].value << " ";
+				file << statement.tokens[i].lexeme << " ";
 			}
 
 			if (statement.validity)
@@ -1421,26 +1422,26 @@ void checkErrors(vector<Statement> *statements)
 
 				if (currentToken.type == DATA_TYPE)
 				{
-					if (currentToken.value == "int")
+					if (currentToken.lexeme == "int")
 					{
 						var.type = "int";
 					}
-					else if (currentToken.value == "string")
+					else if (currentToken.lexeme == "string")
 					{
 						var.type = "string";
 					}
-					else if (currentToken.value == "bool")
+					else if (currentToken.lexeme == "bool")
 					{
 						var.type = "bool";
 					}
-					else if (currentToken.value == "float")
+					else if (currentToken.lexeme == "float")
 					{
 						var.type = "float";
 					}
 				}
 				else if (currentToken.type == IDENTIFIER)
 				{
-					var.name = currentToken.value;
+					var.name = currentToken.lexeme;
 
 					if (statement.tokens[i + 1].type == ASSIGN_OP) // identifier comes before assignment operator ('=')
 					{
@@ -1449,7 +1450,7 @@ void checkErrors(vector<Statement> *statements)
 						// CHECK DATA TYPE OF TOKENS between '=' and ',' or ';'
 						int j = i + 2; // select token after ASSIGN_OP
 						currentToken = (statement.tokens)[j];
-						while (currentToken.value != "," && currentToken.value != ";")
+						while (currentToken.lexeme != "," && currentToken.lexeme != ";")
 						{
 							// check if token is identifier or constant
 							if (currentToken.type == CONSTANT)
@@ -1470,43 +1471,42 @@ void checkErrors(vector<Statement> *statements)
 									break;
 								}
 							}
-							else if (currentToken.type == IDENTIFIER) // it's a variable so we check its data type instead
-							{
-							}
 
 							j++;
 							currentToken = (statement.tokens)[j];
 						}
 					}
-					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ";") || // between data type and ; )(int x;)
-							 (statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].value == ",") || // between data type and , )(int x,)
-							 (statement.tokens[i - 1].value == "," && statement.tokens[i + 1].value == ",") ||		// between commas , ,)(,x,)
-							 (statement.tokens[i - 1].value == "," && statement.tokens[i + 1].value == ";"))		// between , and ;)(,z;)
+					else if ((statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].lexeme == ";") || // between data type and ; )(int x;)
+							 (statement.tokens[i - 1].type == DATA_TYPE && statement.tokens[i + 1].lexeme == ",") || // between data type and , )(int x,)
+							 (statement.tokens[i - 1].lexeme == "," && statement.tokens[i + 1].lexeme == ",") ||		// between commas , ,)(,x,)
+							 (statement.tokens[i - 1].lexeme == "," && statement.tokens[i + 1].lexeme == ";"))		// between , and ;)(,z;)
 
 					{
 						var.initialized = false;
 					}
 					else
+
+					// int x = y + 2;
 					{
 
 						int j = i;
 						currentToken = (statement.tokens)[j];
-						while (currentToken.value != "," && currentToken.value != ";")
+						while (currentToken.lexeme != "," && currentToken.lexeme != ";")
 						{
-							if (currentToken.value == var.name && symbol_table.count(var.name) == 0)
+							if (currentToken.lexeme == var.name && symbol_table.count(var.name) == 0)
 							{
 								statement.validity = false;
-								cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not declared" << endl;
-								statement.message = "Identifier/variable  '" + currentToken.value + "' is not declared";
+								cout << "Line " << statement.line << " : identifier/variable '" << currentToken.lexeme << "' not declared" << endl;
+								statement.message = "Identifier/variable  '" + currentToken.lexeme + "' is not declared";
 								errors.push_back({statement.line, statement.message});
 							}
-							else if (currentToken.value == var.name && symbol_table.count(currentToken.value) > 0)
+							else if (currentToken.lexeme == var.name && symbol_table.count(currentToken.lexeme) > 0)
 							{
-								Variable variable = symbol_table[currentToken.value];
+								Variable variable = symbol_table[currentToken.lexeme];
 								if (!variable.initialized)
 								{
-									cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not initialized" << endl;
-									statement.message = "Variable '" + currentToken.value + "' is not initialized";
+									cout << "Line " << statement.line << " : identifier/variable '" << currentToken.lexeme << "' not initialized" << endl;
+									statement.message = "Variable '" + currentToken.lexeme + "' is not initialized";
 									errors.push_back({statement.line, statement.message});
 								}
 							}
@@ -1543,28 +1543,30 @@ void checkErrors(vector<Statement> *statements)
 			{
 				Token currentToken = (statement.tokens)[i];
 
+				// x = y +
+
 				if (currentToken.type == IDENTIFIER)
 				{
-					var.name = currentToken.value;
+					var.name = currentToken.lexeme;
 
 					if (symbol_table.count(var.name) == 0)
 					{
 						statement.validity = false;
-						cout << "Line " << statement.line << " : identifier/variable '" << currentToken.value << "' not declared" << endl;
-						statement.message = "Identifier/variable '" + currentToken.value + "' is not declared";
+						cout << "Line " << statement.line << " : identifier/variable '" << currentToken.lexeme << "' not declared" << endl;
+						statement.message = "Identifier/variable '" + currentToken.lexeme + "' is not declared";
 						errors.push_back({statement.line, statement.message});
 						break;
 					}
-					else if (symbol_table.count(currentToken.value) > 0)
-					{
-						Variable variable = symbol_table[currentToken.value];
-						if (!variable.initialized)
-						{
-							cout << "Line " << statement.line << " : variable '" << currentToken.value << "' not initialized" << endl;
-							statement.message = "Variable '" + currentToken.value + "' not initialized";
-							errors.push_back({statement.line, statement.message});
-						}
-					}
+					// else if (symbol_table.count(currentToken.lexeme) > 0)
+					// {
+					// 	Variable variable = symbol_table[currentToken.lexeme];
+					// 	if (!variable.initialized)
+					// 	{
+					// 		cout << "Line " << statement.line << " : variable '" << currentToken.lexeme << "' not initialized" << endl;
+					// 		statement.message = "Variable '" + currentToken.lexeme + "' not initialized";
+					// 		errors.push_back({statement.line, statement.message});
+					// 	}
+					// }
 				}
 			}
 		}
@@ -1573,85 +1575,83 @@ void checkErrors(vector<Statement> *statements)
 
 int solveExpression(vector<Token> expression)
 {
+    int accumulator = 0;
+    int i = 0;
+    int n = expression.size();
 
-	int accumulator = 0;
-	int i = 0;
-	int n = expression.size();
+    // Handle the case where the expression is just a single constant or identifier
+    if (n == 1)
+    {
 
-	// Handle the case where the expression is just a single constant or identifier
-	if (n == 1)
-	{
+        Token token = expression[0];
+        if (token.type == CONSTANT)
+        {
+            return stoi(token.lexeme);
+        }
+        else
+        {
+            // cout << "debug seembol table x = " << symbol_table["x"].value << endl;
+            int varValue;
+            // Look up the value of the identifier in the symbol table
+            // cout << "debug solveExp -- of " << token.value << " = " << symbol_table[token.value].value << endl;
+            return symbol_table[token.lexeme].value;
+        }
+    }
 
-		Token token = expression[0];
-		if (token.type == CONSTANT)
-		{
-			return stoi(token.value);
-		}
-		else
-		{
-			// cout << "debug seembol table x = " << symbol_table["x"].value << endl;
+    // Evaluate the expression using a simple left-to-right approach
+    Token left = expression[0];
+    for (int i = 1; i < n; i += 2)
+    {
+        Token op = expression[i];
+        Token right = expression[i + 1];
 
-			int varValue;
-			// Look up the value of the identifier in the symbol table
-			// cout << "debug solveExp -- of " << token.value << " = " << symbol_table[token.value].value << endl;
-			return symbol_table[token.value].value;
-		}
-	}
+        int leftValue, rightValue; 
 
-	// Evaluate the expression using a simple left-to-right approach
-	while (i < n)
-	{
-		Token left = expression[i];
-		Token op = expression[i + 1];
-		Token right = expression[i + 2];
-		i += 3;
+        // Handle the left operand
+        if (left.type == CONSTANT)
+        {
+            leftValue = stoi(left.lexeme);
+        }
+        else
+        {
+            // Look up the value of the identifier in the symbol table
+            leftValue = symbol_table[left.lexeme].value;
+        }
 
-		int leftValue, rightValue;
+        // Handle the right operand
+        if (right.type == CONSTANT)
+        {
+            rightValue = stoi(right.lexeme);
+        }
+        else
+        {
+            // Look up the value of the identifier in the symbol table
+            rightValue = symbol_table[right.lexeme].value;
+        }
 
-		// Handle the left operand
-		if (left.type == CONSTANT)
-		{
-			leftValue = stoi(left.value);
-		}
-		else
-		{
-			// Look up the value of the identifier in the symbol table
-			leftValue = symbol_table[left.value].value;
-		}
+        // Apply the operator
+        if (op.lexeme == "+")
+        {
+            accumulator += leftValue + rightValue;
+        }
+        else if (op.lexeme == "-")
+        {
+            accumulator += leftValue - rightValue;
+        }
+        else if (op.lexeme == "*")
+        {
+            accumulator += leftValue * rightValue;
+        }
+        else if (op.lexeme == "/")
+        {
+            accumulator += leftValue / rightValue;
+        }
 
-		// Handle the right operand
-		if (right.type == CONSTANT)
-		{
-			rightValue = stoi(right.value);
-		}
-		else
-		{
-			// Look up the value of the identifier in the symbol table
-			rightValue = symbol_table[right.value].value;
-		}
+        left = Token{ CONSTANT, to_string(accumulator) };
+    }
 
-		// Apply the operator
-		if (op.value == "+")
-		{
-			accumulator += leftValue + rightValue;
-		}
-		else if (op.value == "-")
-		{
-			accumulator += leftValue - rightValue;
-		}
-		else if (op.value == "*")
-		{
-			accumulator += leftValue * rightValue;
-		}
-		else if (op.value == "/")
-		{
-			accumulator += leftValue / rightValue;
-		}
-	}
-
-	return accumulator;
+    return accumulator;
 }
-
 void getVariableValue(vector<Statement> *statements)
 {
 
@@ -1672,14 +1672,14 @@ void getVariableValue(vector<Statement> *statements)
 
 			if (currentToken.type == IDENTIFIER && statement.tokens[i + 1].type == ASSIGN_OP)
 			{
-				var.name = currentToken.value;
+				var.name = currentToken.lexeme;
 
 				int j = i + 2; // select token after ASSIGN_OP
 				currentToken = (statement.tokens)[j];
 
 				symbol_table[var.name].expression.clear();
 
-				while (currentToken.value != "," && currentToken.value != ";")
+				while (currentToken.lexeme != "," && currentToken.lexeme != ";")
 				{
 
 					symbol_table[var.name].expression.push_back(currentToken);
@@ -1703,10 +1703,8 @@ void printVariableSymbolTable()
 		string expTokens;
 		for (int i = 0; i < variable.second.expression.size(); i++)
 		{
-
 			Token currentToken = variable.second.expression[i];
-
-			expTokens += currentToken.value + " ";
+			expTokens += currentToken.lexeme + " ";
 		}
 
 		cout << variable.first << ", data type: " << variable.second.type << " | initialized: " << variable.second.initialized << " | expression: " << expTokens << " | value: " << variable.second.value << endl;
@@ -1735,6 +1733,148 @@ void printErrors(vector<Error> errors)
 		for (const auto &error : errors)
 		{
 			file << "Line " << error.line << " :\t" << error.message << endl;
+		}
+	}
+
+	file.close();
+}
+
+
+struct interpret
+{
+	int numout;
+	string varname;
+	string stringout;
+	bool varbool;
+	string type;
+	string solve;
+};
+
+void interOut(vector<Statement> *statements)
+{
+	int i = 0;
+	printf(":-------------------------------OUTPUT----------------------------------:\n\n");
+	vector<string> outputAccumulator;
+	interpret interpreter[100];
+	int a = 0;
+	for (Statement statement : *statements)
+	{
+		if (statement.type == "DECLARATION")
+		{
+			for (i = 0; i < statement.tokens.size(); i++)
+			{
+				Token currentToken = (statement.tokens)[i];
+				if (currentToken.type == DATA_TYPE)
+				{
+					// cout << "\nData type|";
+					i++;
+					Token currentToken = (statement.tokens)[i];
+					if (currentToken.type == IDENTIFIER)
+					{
+						// cout << "Ident in dec|";
+						interpreter[a].varname = currentToken.lexeme;
+						i++;
+						Token currentToken = (statement.tokens)[i];
+						if (currentToken.lexeme == "=")
+						{
+							// cout << "=|";
+							i++;
+							Token currentToken = (statement.tokens)[i];
+							for (int j = i; j < statement.tokens.size(); j++)
+							{
+								Token currentToken = (statement.tokens)[j];
+								if (currentToken.lexeme == ";")
+								{
+
+									// cout << interpreter[a].solve;
+									// cout << " here exit ";
+									a++;
+									break;
+								}
+								else
+								{
+									interpreter[a].solve = interpreter[a].solve + currentToken.lexeme;
+								}
+							}
+						}
+						if (currentToken.lexeme == ";")
+						{
+							a++;
+						}
+					}
+					else
+					{
+						// not an identifier
+					}
+				}
+			}
+		}
+		if (statement.type == "ASSIGNMENT")
+		{ // check if it is an assignment type
+			for (i = 0; i < statement.tokens.size(); i++)
+			{ // checks all tokens
+				Token currentToken = (statement.tokens)[i];
+				if (currentToken.type == IDENTIFIER)
+				{
+					cout << "\nident in assign\n";
+				}
+				else
+				{
+					// not an identifier
+				}
+			}
+		}
+		else if (statement.type == "OUTPUT")
+		{
+
+			vector<Token> outputExpression;
+			vector<Token> outputString;
+			int outValue;
+
+			for (i = 0; i < statement.tokens.size(); i++)
+			{
+				int j;
+
+				Token currentToken = (statement.tokens)[i];
+				if (currentToken.lexeme == "tignan") // tignan(x + y) // assume all var are int
+				{
+					j = i + 2;
+					while (statement.tokens[j].lexeme != ")")
+					{
+
+						if (statement.tokens[j+1].description == "String Constant Value")
+						{
+							cout << "debug string == " << statement.tokens[j+1].lexeme << endl;
+							outputAccumulator.push_back(statement.tokens[j+1].lexeme);
+							j += 3;
+							
+						}
+						else
+						{
+							outputExpression.push_back(statement.tokens[j]);
+							j++;
+						}
+
+						
+					}
+					i = j;
+				}
+			}
+
+			outValue = solveExpression(outputExpression);
+			cout << to_string(outValue) << endl;
+			outputAccumulator.push_back(to_string(outValue));
+		}
+	}
+
+	ofstream file(outputFileInterpreter);
+
+	if (file.is_open())
+	{
+		for (int j = 0; j < outputAccumulator.size(); j++)
+		{	
+			// cout << " debug reach " << outputAccumulator[j] << endl;
+			file << outputAccumulator[j] << endl;
 		}
 	}
 
@@ -1789,6 +1929,7 @@ int main()
 			{
 				getVariableValue(&statements);
 				printVariableSymbolTable();
+				interOut(&statements);
 			}
 		}
 		else

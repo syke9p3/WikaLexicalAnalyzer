@@ -1,0 +1,25 @@
+int repeat;
+float repeat;
+int x = 30 + 1.5, e = x + 1;
+y = x + 4;
+
+int b;
+b = x + 8;
+
+int x = 9 + "Hello";
+
+string name = "hello"; 
+int age = 1 + year, a;
+year = age;
+
+int keyword = habang + 1; 
+
+
+int a = "hello";
+
+int c = 9;
+c = b + z;
+
+int d;
+e = d + 8;
+
