@@ -1,7 +1,7 @@
 
 ## I. WiKa Programming Langugae  
 
-This programming project was developed as an output for the course ***COSC 30053: Automata and Language Theory***. Moreover,this programming language draws inspiration
+This programming project was developed as an output for the course ***COSC 30053: Automata and Language Theory***. **```Wika```** draws inspiration
 from **```Bato```**, a Filipino-based programming language using Ruby syntax.The goal of this project is to learn how to develop a simple lexer based on the **```C```** language.
 
 ## II. **How to use the lexer**
